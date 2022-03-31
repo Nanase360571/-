@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--上面的是Mybatis的约束-->
+<mapper namespace="com.wyu.tea.dao.mapper.ClassesMapper">
+
+
+    <insert id="addPatchClass" parameterType="java.util.List">
+        insert ignore into wyu_classes (cla_no) values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.claNo})
+        </foreach>
+    </insert>
+    <insert id="insertByIgnore" parameterType="com.wyu.common.dao.pojo.classes">
+        insert ignore into wyu_classes (cla_no) values (#{claNo})
+    </insert>
+</mapper>

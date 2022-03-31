@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--上面的是Mybatis的约束-->
+<mapper namespace="com.wyu.tea.dao.mapper.CourseTeacherStudentMapper">
+
+
+    <insert id="addPatchStudentToCourse" parameterType="java.util.List">
+        insert  ignore into wyu_course_teacher_student (cts_course,cts_teacher,cts_student) values
+            <foreach collection="list"  item="item" index="index" separator=",">
+                (#{item.ctsCourse},#{item.ctsTeacher},#{item.ctsStudent})
+            </foreach>
+    </insert>
+    <select id="getPatchcourseTeacherStudents" resultType="com.wyu.common.dao.pojo.courseTeacherStudent">
+        select * from wyu_course_teacher_student where (cts_course,cts_teacher,cts_student) in
+        <foreach collection="list"  item="item" index="index" separator="," open="(" close=")">
+            ('${item.ctsCourse}','${item.ctsTeacher}','${item.ctsStudent}')
+        </foreach>
+    </select>
+    <select id="getCourseList" resultType="com.wyu.common.dao.pojo.courseTeacherStudent">
+        SELECT * FROM `wyu_course_teacher_student` where cts_teacher = #{teacherId}
+        GROUP BY cts_course
+    </select>
+</mapper>

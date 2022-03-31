@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--上面的是Mybatis的约束-->
+<mapper namespace="com.wyu.tea.dao.mapper.StudentMapper">
+
+    <insert id="addPatchStudent"  parameterType="java.util.List" useGeneratedKeys="true" keyProperty="list.id" keyColumn="id">
+        insert ignore into wyu_student (account,name,cla_no) values
+        <foreach collection="list" item="item" index="index" separator=",">
+
+            (#{item.account},#{item.name},#{item.claNo})
+
+        </foreach>
+    </insert>
+    <insert id="insertByIgnore" parameterType="com.wyu.tea.dao.pojo.student">
+        insert ignore into wyu_student (account,name,cla_no) values
+        (account,name,claNo)
+
+    </insert>
+
+
+    <select id="selectByIds" resultType="com.wyu.tea.dao.pojo.student" parameterType="java.util.List" >
+        select * from wyu_student where id in
+        <foreach collection="list" item="item" index="index" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--上面的是Mybatis的约束-->
+<mapper namespace="com.wyu.tea.dao.mapper.MajorTargetCourseMapper">
+
+
+    <insert id="insertBatchExist">
+        update wyu_major_target_course set proportion =
+            case
+            <foreach collection="list" item="item" index="index">
+                when mtc_major = #{item.mtcMajor} and mtc_target = #{item.mtcTarget} and mtc_course = #{item.mtcCourse}
+                then #{item.proportion}
+            </foreach>
+                else proportion
+            end
+
+
+    </insert>
+    <insert id="insertBatchNoExist">
+        insert into wyu_major_target_course (mtc_major,mtc_target,mtc_course,proportion) values
+        <foreach collection="list" item="item" index="index">
+            (#{item.mtcMajor},#{item.mtcTarget},#{item.mtcCourse},#{item.proportion})
+        </foreach>
+    </insert>
+</mapper>

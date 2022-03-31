@@ -1,0 +1,5 @@
+# Project exclude paths
+/wyu_admin/target/
+/wyu_common/target/
+/wyu_student/target/
+/wyu_teacher/target/

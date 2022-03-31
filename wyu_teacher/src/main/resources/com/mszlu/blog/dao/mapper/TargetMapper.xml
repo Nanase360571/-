@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--上面的是Mybatis的约束-->
+<mapper namespace="com.wyu.tea.dao.mapper.TargetMapper">
+
+    <insert id="insertBatch">
+        REPLACE INTO wyu_target (id,tar_content) VALUES
+        <foreach collection="list"  item="item" index="index" separator=",">
+            (#{item.id},#{item.tarContent})
+        </foreach>
+    </insert>
+    <insert id="insertBatchNotExist" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO wyu_target (tar_content) VALUES
+        <foreach collection="list"  item="item" index="index" separator=",">
+            (#{item.tarContent})
+        </foreach>
+    </insert>
+</mapper>
