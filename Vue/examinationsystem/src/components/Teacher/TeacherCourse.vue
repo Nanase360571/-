@@ -138,7 +138,7 @@
         class="upload-demo"
         drag
         multiple
-        action="http://localhost:10087/upload"
+        action="upload"
         :headers="headers"
         :data="uploadData"
         :show-file-list="false"
@@ -207,7 +207,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios";axios.defaults.baseURL="http://localhost:10087"
+
 export default {
   data() {
     return {
@@ -249,7 +250,7 @@ export default {
   methods: {
     handleEdit(index, row) {
       console.log(row+"row");
-      axios.post("http://localhost:10087/getStudentList",{
+      axios.post("getStudentList",{
         teacherId: this.$store.state.teacher.id,
         courseId: this.tableData[index].courseId
       },{
@@ -282,7 +283,7 @@ export default {
       const tag = window.confirm("确定移除该学生吗?");
       if(tag){
         console.log(this.tempCourseId, row.id,this.$store.state.teacher.id);
-        axios.post('http://localhost:10087/removeStudent',{
+        axios.post('removeStudent',{
           courseId:this.tempCourseId,
           teacherId: this.$store.state.teacher.id,
           studentId: row.id
@@ -320,7 +321,7 @@ export default {
 
     },
     addStudentToCourse(){
-      axios.post('http://localhost:10087/addStudentToCourse',{
+      axios.post('addStudentToCourse',{
           teacherId: this.$store.state.teacher.id,
           name:this.newStudent.name,
           account:this.newStudent.account,
@@ -346,7 +347,7 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
       }).then(({ value }) => {
-        axios.post('http://localhost:10087/updateKnowledge',{
+        axios.post('updateKnowledge',{
           "teacherId": this.$store.state.teacher.id,
           "courseId":this.showKnowledge[index].knoCourse,
           "id":this.showKnowledge[index].id,
@@ -377,7 +378,7 @@ export default {
       });
     },
     removeKnowledge(index, row){
-      axios.post('http://localhost:10087/removeKnowledge',{
+      axios.post('removeKnowledge',{
         "teacherId": this.$store.state.teacher.id,
         "courseId":this.showKnowledge[index].knoCourse,
         "id":this.showKnowledge[index].id,
@@ -403,7 +404,7 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
       }).then(({ value }) => {
-        axios.post('http://localhost:10087/addKnowledgeToCourse',{
+        axios.post('addKnowledgeToCourse',{
           "teacherId": this.$store.state.teacher.id,
           "courseId":this.tagCourseId,
           "knoContent": value
@@ -431,7 +432,7 @@ export default {
       });
     },
     async updateDataWhenChange() {
-       axios.get('http://localhost:10087/getTeacherCourse?teacherId=' + this.$store.state.teacher.id, {
+       axios.get('getTeacherCourse?teacherId=' + this.$store.state.teacher.id, {
         // params:{
         //   'teacherId': that.$store.state.teacher.id
         // },

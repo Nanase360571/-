@@ -223,7 +223,7 @@
                           class="upload-demo"
                           drag
                           multiple
-                          action="http://localhost:10087/addPatchDb"
+                          action="addPatchDb"
                           :data="uploadData"
                           :headers="headers"
                           :show-file-list="false"
@@ -240,7 +240,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios";axios.defaults.baseURL="http://localhost:10087"
+
 export default {
   name: "TeacherCourse",
 
@@ -335,7 +336,7 @@ export default {
       window.location.href="/static/Itemformat.xls"
     },
     addDB(){
-      axios.post("http://localhost:10087/addDB",{
+      axios.post("addDB",{
         db: this.newDb,
         courseId: this.currentCourseId
       },{
@@ -418,7 +419,7 @@ export default {
       this.itemKey = Math.random();
       console.log("this.itemKey" + this.itemKey);
       axios
-        .get("http://localhost:10087/getCourseDB", {
+        .get("getCourseDB", {
           params: {
             courseId: course.id,
             teacherId: this.$store.state.teacher.id,
@@ -432,7 +433,7 @@ export default {
             this.dbList = response.data.data;
 
             axios
-              .get("http://localhost:10087/getKnowledgeList", {
+              .get("getKnowledgeList", {
                 params: {
                   courseId: course.id,
                   teacherId: this.$store.state.teacher.id,
@@ -459,7 +460,7 @@ export default {
                   }
 
                   axios
-                    .get("http://localhost:10087/getTargetList", {
+                    .get("getTargetList", {
                       params: {
                         courseId: course.id,
                         teacherId: this.$store.state.teacher.id,
@@ -509,7 +510,7 @@ export default {
       }
       console.log(row.targetId);
       axios
-        .post("http://localhost:10087/updateKnowledgeAndTarget", {
+        .post("updateKnowledgeAndTarget", {
           dbId: row.dbId,
           knoId: knoId,
           targetId: targetId,
@@ -544,7 +545,7 @@ export default {
   mounted() {
     console.log("TeacherCourse");
     axios
-      .get("http://localhost:10087/getAllCourse", {
+      .get("getAllCourse", {
         params: {
           teacherId: this.$store.state.teacher.id,
         },

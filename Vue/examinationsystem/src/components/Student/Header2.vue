@@ -163,6 +163,8 @@
 
 <script>
 import axios from "axios";
+axios.defaults.baseURL="http://localhost:10086"
+
 export default {
   name: "Header2",
   props: [
@@ -396,7 +398,7 @@ export default {
       if(tag === 0){          alert("还有未完成题目")
 }
       if(tag === 1){
-      axios.post('http://localhost:10086/paper/submitPaper',{
+      axios.post('paper/submitPaper',{
           'account':this.$store.state.student.account,
           'studentId':this.$store.state.student.id,
           "paperId":this.paperId,

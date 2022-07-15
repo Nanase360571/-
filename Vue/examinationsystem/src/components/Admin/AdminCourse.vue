@@ -17,6 +17,7 @@
 
 <script>
 import axios from "axios";
+axios.defaults.baseURL="http://localhost:10088"
 
 export default {
   name:"MyTest",
@@ -34,7 +35,7 @@ export default {
       if(this.formData.subject === "" || this.formData.number === ""){
         alert("课程编号和课程不能为空")
       }else{
-        axios.post('http://localhost:10088/addAdminCourse',{
+        axios.post('addAdminCourse',{
                 "couSubject": this.formData.subject,
                 "couNumber": this.formData.number
 

@@ -53,6 +53,8 @@
 <script>
 import axios from "axios";
 import TestPage from "@/components/Student/TestPage";
+axios.defaults.baseURL="http://localhost:10086"
+
 export default {
   name:"MyTest",
   components:{TestPage},
@@ -83,7 +85,7 @@ export default {
       alert("可以进入考试")
       this.testDialogVisible = true
 
-      axios.get('http://localhost:10086/randomTest',{
+      axios.get('randomTest',{
       params:{
         'id':row.id
       }
@@ -100,7 +102,7 @@ export default {
   },
   mounted() {
     
-    axios.get('http://localhost:10086/getCourseTest',{
+    axios.get('getCourseTest',{
       params:{
         'studentId':this.$store.state.student.id
       }

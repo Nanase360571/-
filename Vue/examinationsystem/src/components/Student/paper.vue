@@ -219,6 +219,8 @@ import axios from "axios";
 import { saveAnswers } from "../../request/api";
 import { mapGetters } from "vuex";
 import Time from "../../components/module/Time"; // 倒计时组件
+axios.defaults.baseURL="http://localhost:10086"
+
 export default {
   name: "Exam",
   data() {

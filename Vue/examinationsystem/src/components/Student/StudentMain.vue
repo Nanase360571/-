@@ -36,6 +36,7 @@
 </template>
 <script>
 import axios from "axios";
+axios.defaults.baseURL="http://localhost:10086"
 
 export default {
   name: 'StudentMain',
@@ -51,7 +52,7 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
       }).then(({value}) => {
-        axios.post('http://localhost:10086/updatePassword', {
+        axios.post('updatePassword', {
           "account": this.$store.state.student.account,
           "password": value
 

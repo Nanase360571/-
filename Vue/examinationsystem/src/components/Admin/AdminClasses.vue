@@ -17,6 +17,7 @@
 
 <script>
 import axios from "axios";
+axios.defaults.baseURL="http://localhost:10088"
 
 export default {
   name:"MyTest",
@@ -33,7 +34,7 @@ export default {
              if(this.formData.claNo === "" ){
         alert("班号不能为空")
       }else{
-        axios.post('http://localhost:10088/addAdminClasses',{
+        axios.post('addAdminClasses',{
                 "claNo":this.formData.claNo
 
               },{

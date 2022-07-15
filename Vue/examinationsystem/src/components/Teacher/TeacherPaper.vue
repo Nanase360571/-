@@ -76,7 +76,8 @@
 
 
 <script>
-import axios from "axios";
+import axios from "axios";axios.defaults.baseURL="http://localhost:10087"
+
 export default {
   name:"TeacherCourse",
   data() {
@@ -106,7 +107,7 @@ export default {
     selectEvent(val){
         console.log(this.currentPaperId);
         if(this.currentFound === 1){
-        axios.post("http://localhost:10087/analyseByKnowledge",{
+        axios.post("analyseByKnowledge",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -126,7 +127,7 @@ export default {
       )
         }
         if(this.currentFound === 2){
-        axios.post("http://localhost:10087/analyseByTarget",{
+        axios.post("analyseByTarget",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -146,7 +147,7 @@ export default {
       )
         }
         if(this.currentFound === 3){
-        axios.post("http://localhost:10087/analyseByRandom",{
+        axios.post("analyseByRandom",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -164,7 +165,7 @@ export default {
       )
         }
         if(this.currentFound === 4){
-        axios.post("http://localhost:10087/analyseByRandom",{
+        axios.post("analyseByRandom",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -202,7 +203,7 @@ export default {
         //alert("考试结束,可以查看")
             
             this.currentFound = row.papFound
-            axios.get("http://localhost:10087/getAllClasses",{
+            axios.get("getAllClasses",{
               params:{
                 teacherId:this.$store.state.teacher.id,
                 paperId:row.id
@@ -222,7 +223,7 @@ export default {
     }
   },
   mounted() {
-    axios.get("http://localhost:10087/getAllPaperList",{
+    axios.get("getAllPaperList",{
       params:{
         teacherId:this.$store.state.teacher.id
       },headers:{

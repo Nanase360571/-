@@ -325,6 +325,7 @@
 
 <script>
 import axios from "axios";
+axios.defaults.baseURL="http://localhost:10087"
 
 export default {
   data() {
@@ -441,7 +442,7 @@ export default {
           }
         }
 
-        axios.post("http://localhost:10087/FoundByKnowledge",{
+        axios.post("FoundByKnowledge",{
           teacherId:this.$store.state.teacher.id,
           courseId:this.currentCourseId,
           paperName:this.paperName,
@@ -506,7 +507,7 @@ export default {
       }
       if(tag === 0)
       {
-        axios.post("http://localhost:10087/FoundByTarget",{
+        axios.post("FoundByTarget",{
           teacherId:this.$store.state.teacher.id,
           courseId:this.currentCourseId,
           paperName:this.paperName,
@@ -561,7 +562,7 @@ export default {
       }
       if(tag  === 0)
       {
-        axios.post("http://localhost:10087/FoundByRandom",{
+        axios.post("FoundByRandom",{
           teacherId:this.$store.state.teacher.id,
           courseId:this.currentCourseId,
           paperName:this.paperName,
@@ -620,7 +621,7 @@ export default {
       }
       if(tag  === 0)
       {
-        axios.post("http://localhost:10087/FoundBySelf",{
+        axios.post("FoundBySelf",{
           teacherId:this.$store.state.teacher.id,
           courseId:this.currentCourseId,
           paperName:this.paperName,
@@ -658,7 +659,7 @@ export default {
     foundByKnowledge(row){
       console.log("foundByKnowledge"+this.currentCourseId)
       this.currentCourseId = row.id
-      axios.get("http://localhost:10087/getKnowledgeList",{
+      axios.get("getKnowledgeList",{
         params:{
           teacherId:this.$store.state.teacher.id,
           courseId:this.currentCourseId,
@@ -697,7 +698,7 @@ export default {
       this.currentCourseId = row.id
       console.log("foundByTarget"+this.currentCourseId)
 
-      axios.get("http://localhost:10087/getAllTargetList",{
+      axios.get("getAllTargetList",{
         params:{
           teacherId:this.$store.state.teacher.id,
           courseId:this.currentCourseId,
@@ -738,7 +739,7 @@ export default {
       this.currentCourseId = row.id
       console.log("foundBySelf"+this.currentCourseId)
 
-      axios.get("http://localhost:10087/getAllDb",{
+      axios.get("getAllDb",{
         params:{
           teacherId:this.$store.state.teacher.id,
           courseId:this.currentCourseId,
@@ -798,7 +799,7 @@ export default {
     },
   },
   mounted() {
-    axios.get("http://localhost:10087/getAllCourse",{
+    axios.get("getAllCourse",{
       params:{
         teacherId:this.$store.state.teacher.id
       },headers:{

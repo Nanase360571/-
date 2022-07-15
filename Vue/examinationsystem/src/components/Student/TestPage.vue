@@ -177,7 +177,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios";axios.defaults.baseURL="http://localhost:10086"
+
 export default {
   name: "Header2",
   props: [

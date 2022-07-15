@@ -251,6 +251,8 @@
 
 <script>
 import axios from "axios";
+axios.defaults.baseURL="http://localhost:10087"
+
 export default {
   name:"ClassesMajorTarget",
   data() {
@@ -304,7 +306,7 @@ export default {
     showClasses(index, row) {
       console.log(this.majorList[index].id)
       this.currentMajorId = this.majorList[index].id
-      axios.get("http://localhost:10087/getMajorClasses",{
+      axios.get("getMajorClasses",{
         params:{
           majorId: this.majorList[index].id,
         },
@@ -329,7 +331,7 @@ export default {
     },
     removeClasses(index, row){
       console.log(index)
-      axios.post("http://localhost:10087/removeMajorClasses",{
+      axios.post("removeMajorClasses",{
           majorId: this.currentMajorId,
           classesId: this.majorClassesList[index].id
 
@@ -357,7 +359,7 @@ export default {
 
       console.log(this.majorList[index].id)
       this.currentMajorId = this.majorList[index].id
-      axios.get("http://localhost:10087/getLeftClasses",{
+      axios.get("getLeftClasses",{
         params:{
           majorId: this.majorList[index].id,
         },
@@ -377,7 +379,7 @@ export default {
     },
     addClassesToMajor(index,row){
       console.log(index)
-      axios.post("http://localhost:10087/addClassesToMajor",{
+      axios.post("addClassesToMajor",{
         majorId: this.currentMajorId,
         classesId: this.majorClassesList[index].id
 
@@ -405,7 +407,7 @@ export default {
     handleKnowledge(index,row){
       console.log("this.currentMajorId"+this.currentMajorId)
       this.currentMajorId = this.majorList[index].id
-      axios.get("http://localhost:10087/getCourseList",{
+      axios.get("getCourseList",{
         params:{
           teacherId:this.$store.state.teacher.id,
           majorId:this.currentMajorId
@@ -429,7 +431,7 @@ export default {
     handleTarget(index,row){
       this.handleTargetDialogVisible = true
       this.currentCourseId = this.reallyShowCourseList[index].id
-      axios.post("http://localhost:10087/getTargetList",{
+      axios.post("getTargetList",{
         majorId: this.currentMajorId,
         courseId: this.courseList[index].id
 
@@ -463,7 +465,7 @@ export default {
     disKnowledge(index,row){
       this.handleKnowledgeDialogVisible = true
       this.currentCourseId = this.reallyShowCourseList[index].id
-      axios.get("http://localhost:10087/getKnowledgeList",{
+      axios.get("getKnowledgeList",{
         params:{
           courseId:this.courseList[index].id,
           teacherId:this.$store.state.teacher.id,
@@ -543,7 +545,7 @@ export default {
         alert("课程总占比需要为100")
       }
       else {
-        axios.post("http://localhost:10087/setTargetForMajor",{
+        axios.post("setTargetForMajor",{
           majorId: this.currentMajorId,
           courseId:this.currentCourseId,
           targetList:this.targetList,
@@ -579,7 +581,7 @@ export default {
         }
         if(tag ===0 )
         {
-          axios.post("http://localhost:10087/setKnowledgeForCourse",{
+          axios.post("setKnowledgeForCourse",{
             courseId:this.currentCourseId,
             teacherId:this.$store.state.teacher.id,
             knowledgeList:this.knowledgeList
@@ -606,7 +608,7 @@ export default {
   },
 
   mounted() {
-    axios.get("http://localhost:10087/getMajorList",{
+    axios.get("getMajorList",{
       headers:{
         Authorization: sessionStorage.getItem("Authorization")
       }
