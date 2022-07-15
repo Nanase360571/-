@@ -5,13 +5,16 @@ import com.wyu.common.dao.pojo.*;
 import com.wyu.common.vo.Result;
 import com.wyu.tea.dao.mapper.*;
 import com.wyu.tea.service.TeacherDBService;
+import com.wyu.tea.vo.AddDBVo;
 import com.wyu.tea.vo.DbTargetVo;
 import com.wyu.tea.vo.params.UpdateKnowledgeAndTarget;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,38 +50,47 @@ public class TeacherDBServiceImpl  implements TeacherDBService {
     private CourseTeacherMajorMapper courseTeacherMajorMapper;
     @Autowired
     private MajorTargetCourseMapper majorTargetCourseMapper;
+    @Autowired
+    private CourseMapper courseMapper;
+
 
     @Override
     public Result getCourseDB(Integer courseId,Integer teacherId) {
 
         List<DbTargetVo> dbTargetVoList = new ArrayList<>();
 
-        QueryWrapper<dbCourse> dbCourseQueryWrapper = new QueryWrapper<>();
-        dbCourseQueryWrapper.eq("dc_course",courseId);
-        List<dbCourse> dbCourseList = dbCourseMapper.selectList(dbCourseQueryWrapper);
-        if(CollectionUtils.isEmpty(dbCourseList)){return null;}
-        List<Integer> dbIdList = dbCourseList.stream().map(dbCourse::getDcDb).collect(Collectors.toList());
+//        QueryWrapper<dbCourse> dbCourseQueryWrapper = new QueryWrapper<>();
+//        dbCourseQueryWrapper.eq("dc_course",courseId);
+//        List<dbCourse> dbCourseList = dbCourseMapper.selectList(dbCourseQueryWrapper);
+//        if(CollectionUtils.isEmpty(dbCourseList)){return null;}
+//
+//        List<Integer> dbIdList = dbCourseList.stream().map(dbCourse::getDcDb).collect(Collectors.toList());
 
         /*
         * 获取到dbIdList，到题库中查询所有题目
         * */
-        List<db> dbList = dbMapper.selectBatchIds(dbIdList);
-
+        //List<db> dbList = dbMapper.selectBatchIds(dbIdList);
+        QueryWrapper<db> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("db_course",courseId);
+        List<db> dbList = dbMapper.selectList(queryWrapper1);
 
 
         /*
          * 获取到dbIdList，到dbTeacherTarget表中查询所有目标
          * */
         List<Integer> collect = dbList.stream().map(db::getId).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(collect)){
+            return Result.fail(10003,"这门课没有题目");
+        }
         QueryWrapper<dbTargetTeacher> dbTargetQueryWrapper = new QueryWrapper<>();
         dbTargetQueryWrapper.in("dt_db",collect);
         dbTargetQueryWrapper.eq("dt_teacher",teacherId);
         List<dbTargetTeacher> dbTargetTeacherList = dbTargetTeacherMapper.selectList(dbTargetQueryWrapper);
-        List<Integer> collect1 = new ArrayList<>();
+        List<Integer> targetIdList = new ArrayList<>();
         List<target> targetArrayList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(dbTargetTeacherList)){
-            collect1 = dbTargetTeacherList.stream().map(dbTargetTeacher::getDtTarget).collect(Collectors.toList());
-            targetArrayList = targetMapper.selectBatchIds(collect1);
+            targetIdList = dbTargetTeacherList.stream().map(dbTargetTeacher::getDtTarget).collect(Collectors.toList());
+            targetArrayList = targetMapper.selectBatchIds(targetIdList);
         }
         /*
          * 获取到dbIdList，到DbKnowledgeTeacher表中查询所有目标
@@ -88,10 +100,10 @@ public class TeacherDBServiceImpl  implements TeacherDBService {
         dbKnowledgeTeacherQueryWrapper.eq("dkt_teacher",teacherId);
         List<dbKnowledgeTeacher> dbKnowledgeTeachers = dbKnowledgeTeacherMapper.selectList(dbKnowledgeTeacherQueryWrapper);
         List<knowledge> knowledgeArrayList = new ArrayList<>();
-        List<Integer> collect2 = new ArrayList<>();
+        List<Integer> knowledgeIdList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(dbKnowledgeTeachers)){
-            collect2 = dbKnowledgeTeachers.stream().map(dbKnowledgeTeacher::getDktKnowledge).collect(Collectors.toList());
-            knowledgeArrayList = knowledgeMapper.selectBatchIds(collect2);
+            knowledgeIdList = dbKnowledgeTeachers.stream().map(dbKnowledgeTeacher::getDktKnowledge).collect(Collectors.toList());
+            knowledgeArrayList = knowledgeMapper.selectBatchIds(knowledgeIdList);
         }
 
 
@@ -107,17 +119,17 @@ public class TeacherDBServiceImpl  implements TeacherDBService {
                 dbTargetVo.setDbAnswer((db.getDbAnswer()));
                 dbTargetVo.setDbContent(db.getDbContent());
                 if(!CollectionUtils.isEmpty(dbTargetTeacherList)){
-                    if(tag1 < collect1.size()){
+                    if(tag1 < targetIdList.size()){
                         for (dbTargetTeacher dbTargetTeacher : dbTargetTeacherList) {
-                            if(dbTargetVo.getDbId() == dbTargetTeacher.getDtDb())
+                            if(dbTargetVo.getDbId().equals(dbTargetTeacher.getDtDb()))
                             {
                                 dbTargetVo.setTargetId(dbTargetTeacher.getDtTarget());
                             }
                         }
-                        Integer integer = collect1.get(tag1);
+//                        Integer integer = targetIdList.get(tag1);
                         for (int i = 0; i < targetArrayList.size(); i++) {
                             {
-                                if(targetArrayList.get(i).getId() == dbTargetVo.getTargetId())
+                                if(targetArrayList.get(i).getId().equals(dbTargetVo.getTargetId()))
                                 {
                                     //dbTargetVo.setTargetId(targetArrayList.get(i).getId());
                                     dbTargetVo.setTarContent(targetArrayList.get(i).getTarContent());
@@ -132,18 +144,18 @@ public class TeacherDBServiceImpl  implements TeacherDBService {
                     dbTargetVo.setTarContent("未设置");
                 }
                 if(!CollectionUtils.isEmpty(dbKnowledgeTeachers)){
-                    if(tag2 < collect2.size())
+                    if(tag2 < knowledgeIdList.size())
                     {
                         for (dbKnowledgeTeacher dbKnowledgeTeacher : dbKnowledgeTeachers) {
-                            if(dbTargetVo.getDbId() == dbKnowledgeTeacher.getDktDb()){
+                            if(dbTargetVo.getDbId().equals(dbKnowledgeTeacher.getDktDb()) ){
                                 dbTargetVo.setKnoId(dbKnowledgeTeacher.getDktKnowledge());
                             }
                         }
                         if(dbTargetVo.getKnoId()!=null)
                         {
-                            Integer integer = collect2.get(tag2);
+                            Integer integer = knowledgeIdList.get(tag2);
                             for (int i = 0; i < knowledgeArrayList.size(); i++) {
-                                if (knowledgeArrayList.get(i).getId() == dbTargetVo.getKnoId()) {
+                                if (knowledgeArrayList.get(i).getId().equals(dbTargetVo.getKnoId())) {
 //                                    dbTargetVo.setKnoId(knowledgeArrayList.get(i).getId());
                                     dbTargetVo.setKnoContent(knowledgeArrayList.get(i).getKnoContent());
                                     dbTargetVo.setKnoCourse(knowledgeArrayList.get(i).getKnoCourse());
@@ -202,10 +214,10 @@ public class TeacherDBServiceImpl  implements TeacherDBService {
                 .eq("ck_teacher",teacherId);
         List<courseKnowledgeTeacher> courseKnowledgeTeacherList = courseKnowledgeTeacherMapper.selectList(queryWrapper);
         if(CollectionUtils.isEmpty(courseKnowledgeTeacherList))
-        {return Result.success(200);}
+        {return Result.success(null);}
         List<Integer> collect = courseKnowledgeTeacherList.stream().map(courseKnowledgeTeacher::getCkKnowledge).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(collect))
-        {return Result.success(200);}
+        {return Result.success(null);}
         List<knowledge> knowledgeList = knowledgeMapper.selectBatchIds(collect);
 
         return Result.success(knowledgeList);
@@ -213,34 +225,120 @@ public class TeacherDBServiceImpl  implements TeacherDBService {
 
     @Override
     public Result updateKnowledgeAndTarget(UpdateKnowledgeAndTarget updateKnowledgeAndTarget) {
-        if(updateKnowledgeAndTarget.getKnoId()>0)
+if(updateKnowledgeAndTarget.getKnoId()>0)
+{
+    QueryWrapper<dbKnowledgeTeacher> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq("dkt_db",updateKnowledgeAndTarget.getDbId())
+            .eq("dkt_teacher",updateKnowledgeAndTarget.getTeacherId());
+    int delete = dbKnowledgeTeacherMapper.delete(queryWrapper);
+
+    dbKnowledgeTeacher dbKnowledgeTeacher = new dbKnowledgeTeacher();
+    dbKnowledgeTeacher.setDktKnowledge(updateKnowledgeAndTarget.getKnoId());
+    dbKnowledgeTeacher.setDktDb(updateKnowledgeAndTarget.getDbId());
+    dbKnowledgeTeacher.setDktTeacher(updateKnowledgeAndTarget.getTeacherId());
+    int insert = dbKnowledgeTeacherMapper.insert(dbKnowledgeTeacher);
+
+}
+if(updateKnowledgeAndTarget.getTargetId()>0){
+    QueryWrapper<dbTargetTeacher> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq("dt_db",updateKnowledgeAndTarget.getDbId())
+            .eq("dt_teacher",updateKnowledgeAndTarget.getTeacherId());
+    int delete = dbTargetTeacherMapper.delete(queryWrapper);
+
+        dbTargetTeacher dbTargetTeacher = new dbTargetTeacher();
+        dbTargetTeacher.setDtTarget(updateKnowledgeAndTarget.getTargetId());
+        dbTargetTeacher.setDtTeacher(updateKnowledgeAndTarget.getTeacherId());
+        dbTargetTeacher.setDtDb(updateKnowledgeAndTarget.getDbId());
+        int insert = dbTargetTeacherMapper.insert(dbTargetTeacher);
+
+}
+return Result.success(200);
+    }
+
+    @Override
+    @Transactional
+    public Result addBD(AddDBVo addDBVo) {
+        /*
+        *  添加题库
+        * */
+        //参数检验
+        if(CollectionUtils.isEmpty(addDBVo.getDb().getDbAnswer())||addDBVo.getCourseId() == null || "".equals(addDBVo.getDb().getDbTitle()))
         {
-            QueryWrapper<dbKnowledgeTeacher> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("dkt_db",updateKnowledgeAndTarget.getDbId())
-                    .eq("dkt_teacher",updateKnowledgeAndTarget.getTeacherId());
-            int delete = dbKnowledgeTeacherMapper.delete(queryWrapper);
-
-            dbKnowledgeTeacher dbKnowledgeTeacher = new dbKnowledgeTeacher();
-            dbKnowledgeTeacher.setDktKnowledge(updateKnowledgeAndTarget.getKnoId());
-            dbKnowledgeTeacher.setDktDb(updateKnowledgeAndTarget.getDbId());
-            dbKnowledgeTeacher.setDktTeacher(updateKnowledgeAndTarget.getTeacherId());
-            int insert = dbKnowledgeTeacherMapper.insert(dbKnowledgeTeacher);
-
+            return Result.fail(10002,"参数非法");
         }
-        if(updateKnowledgeAndTarget.getTargetId()>0){
-            QueryWrapper<dbTargetTeacher> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("dt_db",updateKnowledgeAndTarget.getDbId())
-                    .eq("dt_teacher",updateKnowledgeAndTarget.getTeacherId());
-            int delete = dbTargetTeacherMapper.delete(queryWrapper);
 
-                dbTargetTeacher dbTargetTeacher = new dbTargetTeacher();
-                dbTargetTeacher.setDtTarget(updateKnowledgeAndTarget.getTargetId());
-                dbTargetTeacher.setDtTeacher(updateKnowledgeAndTarget.getTeacherId());
-                dbTargetTeacher.setDtDb(updateKnowledgeAndTarget.getDbId());
-                int insert = dbTargetTeacherMapper.insert(dbTargetTeacher);
+        if(addDBVo.getDb().getDbType() == 3){
+            db db = new db();
+            db.setDbType(addDBVo.getDb().getDbType());
+            db.setDbContent(addDBVo.getDb().getDbTitle());
+            db.setDbAnswerText(addDBVo.getDb().getDbAnswer().get(0));
+            db.setDbAnswer(addDBVo.getDb().getDbAnswer().get(0));
+            db.setDbCourse(addDBVo.getCourseId());
+            dbMapper.insert(db);
+            return Result.success(200);
+        }
+        if(CollectionUtils.isEmpty(addDBVo.getDb().getDbOption()))
+        {
+            return Result.fail(10002,"参数非法");
+        }
 
+        db db = new db();
+        db.setDbType(addDBVo.getDb().getDbType());
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s : addDBVo.getDb().getDbAnswer()) {
+            stringBuilder.append(s);
+        }
+        db.setDbAnswer(stringBuilder.toString());
+        db.setDbCourse(addDBVo.getCourseId());
+        StringBuilder sb = new StringBuilder();
+        sb.append(addDBVo.getDb().getDbTitle());
+        sb.append("|");
+        List<Integer> integerList = getNumber(addDBVo.getDb().getDbAnswer());
+
+        List<String> dbOption = addDBVo.getDb().getDbOption();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < dbOption.size(); i++) {
+            if(integerList.contains(i)){
+                builder.append(dbOption.get(i));
+                if(integerList.size() != 1){
+                    builder.append("|");;
+                }
+
+            }
+            sb.append(dbOption.get(i));
+            if(i == dbOption.size() -1){
+                continue;
+            }
+            sb.append("|");
+        }
+        db.setDbAnswerText(builder.toString());
+        db.setDbContent(sb.toString());
+        dbMapper.insert(db);
+        return Result.success(200);
+    }
+
+    @Override
+    public Result addPatchDb(List<db> dbs) {
+        for (db db : dbs) {
+            dbMapper.insert(db);
         }
         return Result.success(200);
+    }
+
+    @Override
+    public Result getAllCourse(Integer teacherId) {
+        QueryWrapper<courseTeacherMajor> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ct_teacher",teacherId);
+        List<courseTeacherMajor> courseTeacherMajors = courseTeacherMajorMapper.selectList(queryWrapper);
+        if(courseTeacherMajors.size() == 0){
+            return null;
+        }
+        List<Integer> collect = courseTeacherMajors.stream().map(courseTeacherMajor::getCtCourse).collect(Collectors.toList());
+        QueryWrapper<course> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.in("id",collect);
+        List<course> courses = courseMapper.selectList(queryWrapper1);
+        return Result.success(courses);
+
     }
 
 
@@ -252,5 +350,22 @@ public class TeacherDBServiceImpl  implements TeacherDBService {
             case 3:return "判断题";
             default:return "错误";
         }
+    }
+    public static List<Integer> getNumber(List<String> option){
+        ArrayList<Integer> list = new ArrayList<>();
+        if (option.contains("A"))
+        {
+            list.add(0);
+        }if (option.contains("B"))
+        {
+            list.add(1);
+        }if (option.contains("C"))
+        {
+            list.add(2);
+        }if (option.contains("D"))
+        {
+            list.add(3);
+        }
+        return list;
     }
 }

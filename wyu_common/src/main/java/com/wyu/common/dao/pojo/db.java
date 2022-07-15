@@ -19,5 +19,6 @@ public class db {
     private String dbContent;
     private String dbAnswer;
     private String dbAnswerText;
+    private Integer dbCourse;
 
 }

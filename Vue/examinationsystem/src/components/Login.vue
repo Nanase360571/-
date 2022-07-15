@@ -143,6 +143,52 @@ data() {
       )
     },
     onSubmitAdmin(){
+            axios.post('http://localhost:10088/loginAdmin',{
+        "account": this.form.account,
+        "password": this.form.password
+
+      },{
+        headers:{
+          Authorization:sessionStorage.getItem("Authorization")
+        }
+      }).then(
+          response =>{
+            console.log(response)
+            if(response.data.code === 200){
+              sessionStorage.setItem("Authorization",response.data.data)
+              /*
+              * 请求管理员信息，并存储到store中
+              * */
+              axios.post('http://localhost:10088/getAdminMsg',{
+                "account": this.form.account,
+                "password": this.form.password
+
+              },{
+                headers:{
+                  Authorization:sessionStorage.getItem("Authorization")
+                }
+              }).then(
+                  response => {
+                    this.$store.state.admin = response.data.data
+                    console.log("this.$store.state.teacher"+this.$store.state.admin.account)
+                    this.$router.push("/AdminMain");
+                  }
+              )
+
+            }if(response.data.code === 10000){
+              alert(response.data.msg)
+            }if(response.data.code === 10001){
+              alert(response.data.msg)
+            }
+            if(response.data.code === 10003){
+              alert(response.data.msg)
+            }
+
+          },
+          error => {
+            alert("500,登录失败")
+          }
+      )
 
     },
     created() {
@@ -174,6 +220,8 @@ data() {
 <style scoped>
 .login {
   background-color: #bcdef3;
+  background-image: url("./back.jpg");
+  background-size: 1000px;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -182,7 +230,7 @@ data() {
 .form {
   width: 40%;
   margin-bottom: 20vh;
-  background-color: white;
+  background-color: #eff6f5;
   border-radius: 2px;
   padding: 5% 3%;
 }

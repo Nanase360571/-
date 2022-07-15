@@ -17,5 +17,6 @@ import java.util.List;
 public class SetTargetForMajorParam {
     private Integer majorId;
     private Integer courseId;
+    private Integer teacherId;
     private List<TargetVo> targetList;
 }

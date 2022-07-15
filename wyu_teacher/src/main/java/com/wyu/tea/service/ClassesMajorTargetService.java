@@ -16,7 +16,7 @@ public interface ClassesMajorTargetService {
 
     Result getLeftClasses(Integer majorId);
 
-    Result getCourseList(Integer teacherId);
+    Result getCourseList(Integer teacherId,Integer majorId);
 
     Result getTargetList(RemoveAndAddMajorClassesParam param);
 

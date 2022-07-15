@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 @Data
 public class SubmitPaperParams {
-    private Integer account;
+    private String account;
     private Integer paperId;
     private Integer studentId;
     private ArrayList<dbVo> singleChoiceArrayList;

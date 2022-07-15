@@ -13,6 +13,7 @@ public class paperVo {
     private Integer judgePoint;
     private String startTime;
     private String endTime;
-    private String fillTime;
+    private Integer hours;
+    private Integer minutes;
 
 }

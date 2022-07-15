@@ -186,11 +186,11 @@
 
             </template>
           </el-table-column>
-          <el-table-column label="占比(%)">
+          <!-- <el-table-column label="占比(%)">
             <template slot-scope="scope">
               <el-input placeholder="请输入占比" v-show="isEdit" v-model="scope.row.proportion" oninput="value=value.replace(/[^0-9.]/g,'')"></el-input>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column label="">
             <template slot-scope="scope">
               <el-button @click="removeTarget(scope.$index,scope.row)">移除</el-button>
@@ -332,7 +332,8 @@ export default {
       axios.post("http://localhost:10087/removeMajorClasses",{
           majorId: this.currentMajorId,
           classesId: this.majorClassesList[index].id
-        ,
+
+      },{
         headers:{
           Authorization: sessionStorage.getItem("Authorization")
         }
@@ -379,7 +380,8 @@ export default {
       axios.post("http://localhost:10087/addClassesToMajor",{
         majorId: this.currentMajorId,
         classesId: this.majorClassesList[index].id
-        ,
+
+      },{
         headers:{
           Authorization: sessionStorage.getItem("Authorization")
         }
@@ -401,11 +403,12 @@ export default {
       )
     },
     handleKnowledge(index,row){
-      console.log(index)
+      console.log("this.currentMajorId"+this.currentMajorId)
       this.currentMajorId = this.majorList[index].id
       axios.get("http://localhost:10087/getCourseList",{
         params:{
-          teacherId:this.$store.state.teacher.id
+          teacherId:this.$store.state.teacher.id,
+          majorId:this.currentMajorId
         },
         headers:{
           Authorization: sessionStorage.getItem("Authorization")
@@ -428,7 +431,9 @@ export default {
       this.currentCourseId = this.reallyShowCourseList[index].id
       axios.post("http://localhost:10087/getTargetList",{
         majorId: this.currentMajorId,
-        courseId: this.courseList[index].id,
+        courseId: this.courseList[index].id
+
+      },{
         headers:{
           Authorization: sessionStorage.getItem("Authorization")
         }
@@ -437,6 +442,16 @@ export default {
             if(response.data.code = 200)
             {
               this.targetList = response.data.data
+              if(this.targetList === null){
+                let obj = {
+                  proportion: 0,
+                  tarContent: "",
+                  tarId: ""
+                }
+                console.log("this.targetList = obj")
+                this.targetList = []
+                this.targetList.push(obj)
+              }
               this.targetDialogVisible = true
 
             }
@@ -460,6 +475,19 @@ export default {
           response=>{
             if(response.data.code == 200){
               this.knowledgeList = response.data.data
+              this.knowledgeList = response.data.data
+              console.log(this.knowledgeList)
+              if(this.knowledgeList === null){
+                let obj = {
+                  knoCourse: 0,
+                  knoContent: "",
+                  id: 0
+                }
+                console.log("this.targetList = obj")
+                this.knowledgeList = []
+                this.knowledgeList.push(obj)
+              }
+              this.handleKnowledgeDialogVisible = true
 
             }
           }
@@ -473,14 +501,37 @@ export default {
       this.knowledgeList.splice(index,1)
     },
     addTarget(index,row){
-      console.log(index)
-      this.targetList.push({})
+      console.log(this.targetList)
+      if(this.targetList === null){
+        console.log("null")
+        let obj = {
+          proportion: 0,
+          tarContent: "",
+          tarId: ""
+        }
+        this.targetList = obj
+      }else{
+              this.targetList.push({       
+      })
+      }
+
     },addKnowledge(index,row){
       console.log(index)
-      this.knowledgeList.push({})
+      if(this.knowledgeList === null){
+        console.log("null")
+        let obj = {
+          knoCourse: 0,
+          knoContent: "",
+          id: 0
+        }
+        this.knowledgeList = obj
+      }else{
+        this.knowledgeList.push({
+        })
+      }
     },
     handleModify(){
-      if(this.targetList.length != 0){
+      
         let sum = Number(0)
         for(let index in this.targetList){
           sum = sum +Number(this.targetList[index].proportion)
@@ -488,7 +539,7 @@ export default {
             alert("课程目标不能为空")
           }
         }
-      if(sum != 100 ){
+      if(sum == -1 ){
         alert("课程总占比需要为100")
       }
       else {
@@ -496,7 +547,9 @@ export default {
           majorId: this.currentMajorId,
           courseId:this.currentCourseId,
           targetList:this.targetList,
+          teacherId:this.$store.state.teacher.id
 
+        },{
           headers:{
             Authorization: sessionStorage.getItem("Authorization")
           }
@@ -510,11 +563,11 @@ export default {
         this.handleTargetDialogVisible = false
 
       }
-      }
+      
 
     },
     handleModifyKnowledge(){
-      if(this.knowledgeList.length != 0){
+
         let tag = 0
         for(let  index in this.knowledgeList)
         {
@@ -529,7 +582,9 @@ export default {
           axios.post("http://localhost:10087/setKnowledgeForCourse",{
             courseId:this.currentCourseId,
             teacherId:this.$store.state.teacher.id,
-            knowledgeList:this.knowledgeList,
+            knowledgeList:this.knowledgeList
+
+          },{
             headers:{
               Authorization: sessionStorage.getItem("Authorization")
             }
@@ -544,7 +599,7 @@ export default {
               }
           )
         }
-      }
+
       this.handleKnowledgeDialogVisible = false
     }
 

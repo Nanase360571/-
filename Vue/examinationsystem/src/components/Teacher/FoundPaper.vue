@@ -65,7 +65,9 @@
                 value-format="yyyy-MM-dd HH:mm:ss">
             </el-date-picker>
           </el-form-item>
-
+          <el-form-item label="考试时长(小时)">
+                 <el-input-number v-model="examTime" :precision="2" :step="0.1" :max="10" ></el-input-number>
+          </el-form-item>
         </el-form>
       </div>
 
@@ -137,7 +139,9 @@
                 value-format="yyyy-MM-dd HH:mm:ss">
             </el-date-picker>
           </el-form-item>
-
+          <el-form-item label="考试时长(小时)">
+                 <el-input-number v-model="examTime" :precision="2" :step="0.1" :max="10" ></el-input-number>
+          </el-form-item>
         </el-form>
       </div>
 
@@ -209,7 +213,9 @@
                 value-format="yyyy-MM-dd HH:mm:ss">
             </el-date-picker>
           </el-form-item>
-
+          <el-form-item label="考试时长(小时)">
+                 <el-input-number v-model="examTime" :precision="2" :step="0.1" :max="10" ></el-input-number>
+          </el-form-item>
         </el-form>
       </div>
 
@@ -266,6 +272,9 @@
           <el-form-item label="判断题题量" >
             <el-input v-model="selfJudge" placeholder="" style="size:20px" type="number" :disabled="true"></el-input>
           </el-form-item>
+          <el-form-item label="考试时长(小时)">
+                 <el-input-number v-model="examTime" :precision="2" :step="0.1" :max="10" ></el-input-number>
+          </el-form-item>
         </el-form>
       </div>
 
@@ -320,6 +329,7 @@ import axios from "axios";
 export default {
   data() {
     return {
+      examTime:1,
       selfSingle:0,
       selfMulti:0,
       selfJudge:0,
@@ -445,13 +455,17 @@ export default {
           singleSum:this.singleSum,
           judgeSum:this.judgeSum,
           knowledgeList:params,
+          papFound:1,
+          examTime:this.examTime,
+
+        },{
           headers:{
             Authorization: sessionStorage.getItem("Authorization")
           }
         }).then(
             response =>{
               if(response.data.code != 200){
-                alert(response.data.data)
+                alert(response.data.msg)
               }else {
                 this.$message("组卷成功")
                 this.knowledgeVisible = false
@@ -506,6 +520,10 @@ export default {
           singleSum:this.singleSum,
           judgeSum:this.judgeSum,
           targetList:this.reallyShowTargetList,
+          papFound:2,
+          examTime:this.examTime,
+
+        },{
           headers:{
             Authorization: sessionStorage.getItem("Authorization")
           }
@@ -513,7 +531,7 @@ export default {
             response =>{
               if(response.data.code === 200){
                 this.$message("组卷成功")
-                this.knowledgeVisible = false
+                this.targetVisible = false
 
               }else {
                 alert(response.data.data)
@@ -556,6 +574,10 @@ export default {
           multiSum:this.multiSum,
           singleSum:this.singleSum,
           judgeSum:this.judgeSum,
+          papFound:3,
+          examTime:this.examTime,
+
+        },{
           headers:{
             Authorization: sessionStorage.getItem("Authorization")
           }
@@ -612,6 +634,10 @@ export default {
           singleSum:this.singleSum,
           judgeSum:this.judgeSum,
           dbList:this.multipleSelection,
+          papFound:4,
+          examTime:this.examTime,
+
+        },{
           headers:{
             Authorization: sessionStorage.getItem("Authorization")
           }
@@ -772,7 +798,7 @@ export default {
     },
   },
   mounted() {
-    axios.get("http://localhost:10087/getCourseList",{
+    axios.get("http://localhost:10087/getAllCourse",{
       params:{
         teacherId:this.$store.state.teacher.id
       },headers:{

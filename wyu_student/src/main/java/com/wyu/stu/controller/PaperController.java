@@ -31,9 +31,9 @@ public class PaperController {
                              @PathParam("paperId") Integer paperId){
         return  service.getPaperDb(studentId,paperId);
     }
+
     @PostMapping("/submitPaper")
     public Result submitPaper(@RequestBody SubmitPaperParams submitPaperParams){
-        System.out.println(submitPaperParams);
-        return  null;
+        return  service.submitPaper(submitPaperParams);
     }
 }

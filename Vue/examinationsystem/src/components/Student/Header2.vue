@@ -174,16 +174,16 @@ export default {
     "singlePoint",
     "multiPoint",
     "judgePoint",
-    "fillTime",
     "papName",
-    "paperId"
+    "paperId",
+    "hours",
+    "minutes"
   ],
   data() {
     return {
       radio: 3,
-      hours: 0,
-      minutes: 0,
-      seconds: 10,
+      
+      seconds: 0,
       reallySingleChoiceArrayList: [],
       reallyMultipleChoiceArrayList: [],
       realyTfArrayList: [],
@@ -193,11 +193,8 @@ export default {
 
 },
   mounted() {
-    let time = this.fillTime.split(":")  
-    console.log("time"+time);
-    this.hours = parseInt(time[0])
-    this.minutes = parseInt(time[1])
-    this.seconds = parseInt(time[2])
+
+   
     this.countTime();
       for(let index in this.singleChoiceArrayList){
                 let singleTemp = {
@@ -320,6 +317,8 @@ export default {
           item.isChecked = '1'
           this.realyTfArrayList[index].isChecked = '1'
           console.log(this.realyTfArrayList[index])
+                    console.log("this.tfArrayList"+this.tfArrayList)
+
 
     },
     exit() {
@@ -375,6 +374,28 @@ export default {
       }, 1000);
     },
     submit(){
+      var tag = 1;
+      for(let index in this.singleChoiceArrayList){
+        if(this.singleChoiceArrayList[index].stuAnswer === null ||this.singleChoiceArrayList[index].stuAnswer.length ===0 ){
+          tag = 0 
+          break;
+        }
+      }
+      for(let index in this.multipleChoiceArrayList){
+        if(this.singleChoiceArrayList[index].stuAnswer === null ||this.singleChoiceArrayList[index].stuAnswer.length ===0 ){
+          tag = 0 
+          break;
+        }
+      }
+      for(let index in this.tfArrayList){
+        if(this.singleChoiceArrayList[index].stuAnswer === null ||this.singleChoiceArrayList[index].stuAnswer.length ===0 ){
+          tag = 0 
+          break;
+        }
+      }
+      if(tag === 0){          alert("还有未完成题目")
+}
+      if(tag === 1){
       axios.post('http://localhost:10086/paper/submitPaper',{
           'account':this.$store.state.student.account,
           'studentId':this.$store.state.student.id,
@@ -382,7 +403,15 @@ export default {
           singleChoiceArrayList:this.singleChoiceArrayList,
           multipleChoiceArrayList:this.multipleChoiceArrayList,
           tfArrayList:this.tfArrayList
-        })
+        }).then(
+          response =>{
+            if(response.data.code === 200){
+              alert("提交成功")
+              this.$emit("CDis", false);
+            }
+          }
+        )
+      }
     }
   },
   watch: {

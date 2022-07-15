@@ -23,9 +23,17 @@ public class FoundByKnowledgeVo {
     private Integer paperSum;
     private String startTime;
     private String endTime;
+    private Integer papFound;
+    private String examTime;
+    /**
+     * 存储模块题目数量
+     * */
     private Integer multiNumber;
     private Integer singleNumber;
     private Integer judgeNumber;
+    /**
+     * 存储模块分数
+     * */
     private Integer singleSum;
     private Integer judgeSum;
     private Integer multiSum;

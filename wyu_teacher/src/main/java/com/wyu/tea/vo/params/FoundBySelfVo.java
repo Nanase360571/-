@@ -28,5 +28,7 @@ public class FoundBySelfVo {
     private Integer singleSum;
     private Integer judgeSum;
     private Integer multiSum;
+    private Integer papFound;
+    private String examTime;
     private List<dbVo> dbList;
 }

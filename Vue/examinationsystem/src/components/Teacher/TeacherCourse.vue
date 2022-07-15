@@ -4,7 +4,15 @@
       style="width: 100%">
     <el-table-column
         label="课程名称"
-        prop="course">
+        prop="course"
+        width="200"
+        >
+    </el-table-column>
+    <el-table-column
+        label="课程编号"
+        prop="couNumber"
+        width="100"
+    >
     </el-table-column>
     <el-table-column
         label="知识点"
@@ -12,12 +20,15 @@
     </el-table-column>
     <el-table-column
         label="课程目标"
-        prop="target">
+        prop="target"
+        >
     </el-table-column>
 
 
     <el-table-column
-        align="right">
+        align="right"
+
+    >
 <!--      <template slot="header" slot-scope="scope">-->
 
 <!--      </template>-->
@@ -128,6 +139,7 @@
         drag
         multiple
         action="http://localhost:10087/upload"
+        :headers="headers"
         :data="uploadData"
         :show-file-list="false"
         :on-success="handleAvatarSuccess"
@@ -199,6 +211,9 @@ import axios from "axios";
 export default {
   data() {
     return {
+      headers:{
+        Authorization: sessionStorage.getItem("Authorization")
+      },
       imageUrl: '',
       //控制弹窗 显示
       dialogVisible:false,
@@ -218,7 +233,11 @@ export default {
       },
       uploadData:{
         teacherId: this.$store.state.teacher.id,
-        courseId:this.tempCourseId
+        courseId:this.tempCourseId,
+        Authorization: sessionStorage.getItem("Authorization"),
+        headers:{
+          Authorization: sessionStorage.getItem("Authorization")
+        }
       },
       checkKnowledge:false,
       KnowledgeList:[],
@@ -229,9 +248,14 @@ export default {
   },
   methods: {
     handleEdit(index, row) {
+      console.log(row+"row");
       axios.post("http://localhost:10087/getStudentList",{
         teacherId: this.$store.state.teacher.id,
         courseId: this.tableData[index].courseId
+      },{
+        headers:{
+          Authorization: sessionStorage.getItem("Authorization")
+        }
       }).then(
           response =>{
             this.studentList = response.data.data
@@ -262,6 +286,10 @@ export default {
           courseId:this.tempCourseId,
           teacherId: this.$store.state.teacher.id,
           studentId: row.id
+        },{
+          headers:{
+            Authorization: sessionStorage.getItem("Authorization")
+          }
         }).then(
             response =>{
               this.$message('移除成功');
@@ -287,7 +315,7 @@ export default {
       const  isXls = file.type
       if(isXls === "application/vnd.ms-excel")
       {
-        alert("isXls")
+        alert("添加成功")
       }
 
     },
@@ -420,6 +448,7 @@ export default {
 
             for (let i in temp) {
               const course = temp[i].course.couSubject;
+              const couNumber = temp[i].course.couNumber;
               const courseId = temp[i].course.id;
 
               /*knowledge封装*/
@@ -447,7 +476,7 @@ export default {
                 target = '无'
               }
 
-              table[i] = {course, knowledge, target, courseId}
+              table[i] = {course,couNumber, knowledge, target, courseId}
             }
 
             for (let index in table) {

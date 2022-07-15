@@ -43,9 +43,10 @@
         :singlePoint="singlePoint"
         :multiPoint="multiPoint"
         :judgePoint="judgePoint"
-        :fillTime="fillTime"
         :papName="papName"
         :paperId="paperId"
+        :hours="hours"
+        :minutes="minutes"
       ></Header2>
 
     </el-dialog>
@@ -62,6 +63,8 @@ export default {
   components: {Header2},
   data() {
     return {
+      minutes:0,
+      hours:0,
       paperList:[],
       examDialogVisible:false,
       singleChoiceArrayList: [],
@@ -104,9 +107,8 @@ export default {
         }).then(
 
             response =>{
-              this.examDialogVisible = true
-              console.log(response.data)
-              console.log(response.data.code)
+              
+              
 
               if(response.data.code === 200){
                 console.log(response.data.data.singleChoiceArrayList)
@@ -117,7 +119,12 @@ export default {
                 this.singlePoint=response.data.data.singlePoint
                 this.multiPoint=response.data.data.multiPoint
                 this.judgePoint=response.data.data.judgePoint
-                this.fillTime=response.data.data.fillTime
+                this.examDialogVisible = true
+                this.hours = response.data.data.hours
+                this.minutes = response.data.data.minutes
+
+              }else{
+                alert(response.data.msg )
               }
             }
         )

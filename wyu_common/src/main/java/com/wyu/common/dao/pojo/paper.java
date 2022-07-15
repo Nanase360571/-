@@ -22,5 +22,10 @@ public class paper {
     private Integer papJudge;
     private Integer papTotal ;
     private String papName;
+    private Integer papSingleSum;
+    private Integer papMultiSum;
+    private Integer papJudgeSum;
+    private Integer papFound;
+    private String papExamTime;
 
 }

@@ -16,6 +16,11 @@ export default new Vuex.Store({
       account: '',
       password:'',
       name:''
+    },
+    admin : {
+      id: '',
+      account: '',
+      password:'',
     }
   },
   mutations: {

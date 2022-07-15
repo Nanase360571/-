@@ -18,4 +18,5 @@ public class courseTargetTeacher {
     private Integer id;
     private Integer cttTeacher;
     private Integer cttTarget;
+    private Integer cttCourse;
 }

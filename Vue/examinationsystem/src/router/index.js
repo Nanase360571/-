@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import MyTest from '../components/MyTest' 
+import MyTest from '../components/Student/MyTest' 
 import Main from '../components/Main'
 import Login from '../components/Login'
 import StudentMain from '../components/Student/StudentMain'
@@ -13,6 +13,12 @@ import TeacherDB from "@/components/Teacher/TeacherDB";
 import TeacherTest from "@/components/Teacher/TeacherTest";
 import TeacherPaper from "@/components/Teacher/TeacherPaper";
 import ClassesMajorTarget from "@/components/Teacher/ClassesMajorTarget";
+import AdminMain from "../components/Admin/AdminMain"
+import AdminCourse from "../components/Admin/AdminCourse"
+import AdminTeacher from "../components/Admin/AdminTeacher"
+import AdminMajor from "../components/Admin/AdminMajor"
+import AdminClasses from "../components/Admin/AdminClasses"
+import AdminMajorCourseTeacher from "../components/Admin/AdminMajorCourseTeacher"
 Vue.use(VueRouter)
 
 const routes = [
@@ -72,6 +78,61 @@ const routes = [
       }
     ]
   },
+  //管理员
+  {
+    path:"/AdminMain",
+    name:"AdminMain",
+    component: AdminMain,
+    redirect: "/AdminMain/AdminCourse",
+    children: [
+      {
+        name:'AdminCourse',
+        path: '/AdminMain/AdminCourse',
+        components: {AdminCourse:AdminCourse},
+        beforeRouteEnter(to,from,next){
+          console.log("enter AdminCourse")
+          next();
+        }
+      },
+      {
+        name:'AdminTeacher',
+        path: '/AdminMain/AdminTeacher',
+        components: {AdminTeacher:AdminTeacher},
+        beforeRouteEnter(to,from,next){
+          console.log("enter AdminTeacher")
+          next();
+        }
+      },
+      {
+        name:'AdminMajor',
+        path: '/AdminMain/AdminMajor',
+        components: {AdminMajor:AdminMajor},
+        beforeRouteEnter(to,from,next){
+          console.log("enter AdminMajor")
+          next();
+        }
+      },
+      {
+        name:'AdminClasses',
+        path: '/AdminMain/AdminClasses',
+        components: {AdminClasses:AdminClasses},
+        beforeRouteEnter(to,from,next){
+          console.log("enter AdminClasses")
+          next();
+        }
+      },
+      {
+        name:'AdminMajorCourseTeacher',
+        path: '/AdminMain/AdminMajorCourseTeacher',
+        components: {AdminMajorCourseTeacher:AdminMajorCourseTeacher},
+        beforeRouteEnter(to,from,next){
+          console.log("enter AdminMajorCourseTeacher")
+          next();
+        }
+      },
+    ]
+  },
+  //教师
   {
     path:"/TeacherMain",
     name:"TeacherMain",

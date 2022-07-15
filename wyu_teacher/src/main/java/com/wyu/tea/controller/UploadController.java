@@ -2,8 +2,10 @@ package com.wyu.tea.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wyu.common.dao.pojo.classes;
+import com.wyu.common.dao.pojo.classesCourse;
 import com.wyu.common.dao.pojo.courseTeacherStudent;
 import com.wyu.common.vo.Result;
+import com.wyu.tea.dao.mapper.ClassesCourseMapper;
 import com.wyu.tea.dao.mapper.ClassesMapper;
 import com.wyu.tea.dao.mapper.CourseTeacherStudentMapper;
 import com.wyu.tea.dao.mapper.StudentMapper;
@@ -51,6 +53,8 @@ public class UploadController {
 
     @Autowired
     private ClassesMapper classesMapper;
+    @Autowired
+    private ClassesCourseMapper classesCourseMapper;
 
     @PostMapping("/upload")
     @Transactional
@@ -71,6 +75,7 @@ public class UploadController {
         System.out.println(absolutePath+"{}");
         List<student> studentList = poiReadExcel.read(absolutePath);
         List<String> claNoList = studentList.stream().map(student::getClaNo).collect(Collectors.toList());
+        List<String> stringList = claNoList;
         List<String> collect = claNoList.stream().distinct().collect(Collectors.toList());
         List<classes> classesList = new ArrayList<>();
         for (String s : collect) {
@@ -129,6 +134,7 @@ public class UploadController {
         classesQueryWrapper.in("cla_no",classNoList);
         List<classes> existClassList = classesMapper.selectList(classesQueryWrapper);
 
+
         //将已经存在了的班级去除，将未加入班级表的班级加入班级表
         List<String> allClassesNoList = classesList.stream().map(classes::getClaNo).collect(Collectors.toList());
         List<String> isExistClassesNoList = existClassList.stream().map(classes::getClaNo).collect(Collectors.toList());
@@ -139,9 +145,9 @@ public class UploadController {
             }
         }
         //将未加入classes表的班级去重汇总
+        List<classes> classesList1 = new ArrayList<>();
         if(tag2.size() != 0)
         {
-            List<classes> classesList1 = new ArrayList<>();
             for (int i = 0; i < classesList.size(); i++) {
                 if(tag2.contains(i)){
                     continue;
@@ -251,6 +257,47 @@ public class UploadController {
         else {
             courseTeacherStudentMapper.addPatchStudentToCourse(list);
         }
+
+        /**
+         *将班级Id，和courseId，classId插入到class-course表中
+         * */
+
+//        for (classes classes : existClassList) {
+//            classesCourse classesCourse = new classesCourse();
+//            classesCourse.setCcCourse(courseId);
+//            classesCourse.setCcTeacher(teacherId);
+//            classesCourse.setCcClass(classes.getId());
+//            classesCourseMapper.insertClasses(classesCourse);
+//        }
+//        Integer a = 0;
+//        System.out.println(a.equals(1));
+        QueryWrapper<classes> classesQueryWrapper2 = new QueryWrapper<>();
+        classesQueryWrapper.in("cla_no",classNoList);
+        List<classes> existClassList2 = classesMapper.selectList(classesQueryWrapper);
+        for (classes classes : existClassList2) {
+            classesCourse classesCourse = new classesCourse();
+            classesCourse.setCcCourse(courseId);
+            classesCourse.setCcTeacher(teacherId);
+            classesCourse.setCcClass(classes.getId());
+            //classesCourseMapper.insertClasses(classesCourse);
+            List<com.wyu.common.dao.pojo.classesCourse> list1 = classesCourseMapper.getList();
+            classesCourseMapper.insert(classesCourse);
+
+
+        }
+
+//        for (String s : stringList) {
+//            classesCourse classesCourse = new classesCourse();
+//            classesCourse.setCcClass(Integer.parseInt(s));
+//            classesCourse.setCcCourse(courseId);
+//            classesCourse.setCcTeacher(teacherId);
+//            classesCourseMapper.insertClasses(classesCourse);
+//        }
+
+
+
+
+
         return Result.success(200);
     }
 }

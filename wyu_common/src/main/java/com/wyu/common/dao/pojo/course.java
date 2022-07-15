@@ -17,4 +17,5 @@ public class course {
     private Integer id;
     private String couSubject;
     private String couNumber;
+    private Integer isTest;
 }

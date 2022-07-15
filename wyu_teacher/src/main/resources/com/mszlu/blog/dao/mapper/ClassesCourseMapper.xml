@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--上面的是Mybatis的约束-->
+<mapper namespace="com.wyu.tea.dao.mapper.ClassesCourseMapper">
+
+
+    <insert id="insertClasses" parameterType="com.wyu.common.dao.pojo.classesCourse">
+        insert ignore into wyu_classes_course (cc_course,cc_class,cc_teacher) values (#{ccCourse},#{ccClass},#{ccTeacher})
+    </insert>
+
+    <resultMap id="sda" type="com.wyu.common.dao.pojo.classesCourse">
+        <id property="id" column="id"></id>
+        <result property="ccClass" column="cc_class"></result>
+        <result property="ccCourse" column="cc_course"></result>
+        <result property="ccTeacher" column="cc_teacher"></result>
+    </resultMap>
+
+    <select id="getList" resultMap="sda">
+        select * from wyu_classes_course
+    </select>
+</mapper>

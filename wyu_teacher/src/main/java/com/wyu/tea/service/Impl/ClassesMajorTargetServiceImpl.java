@@ -60,6 +60,13 @@ public class ClassesMajorTargetServiceImpl implements ClassesMajorTargetService 
 
     @Autowired
     private KnowledgeMapper knowledgeMapper;
+
+    @Autowired
+    private CourseTargetTeacherMapper courseTargetTeacherMapper;
+
+    @Autowired
+    private CourseTeacherMajorMapper courseTeacherMajorMapper;
+
     @Override
     public Result getMajorList() {
         List<major> majors = majorMapper.selectList(null);
@@ -130,12 +137,16 @@ public class ClassesMajorTargetServiceImpl implements ClassesMajorTargetService 
     * 查询该教师所有的课程
     * */
     @Override
-    public Result getCourseList(Integer teacherId) {
-        List<courseTeacherStudent> list=courseTeacherStudentMapper.getCourseList(teacherId);
-        if(CollectionUtils.isEmpty(list)){
+    public Result getCourseList(Integer teacherId,Integer majorId) {
+        //List<courseTeacherStudent> list=courseTeacherStudentMapper.getCourseList(teacherId);
+        QueryWrapper<courseTeacherMajor> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ct_teacher",teacherId);
+        queryWrapper.eq("ct_major",majorId);
+        List<courseTeacherMajor> courseTeacherMajors = courseTeacherMajorMapper.selectList(queryWrapper);
+        if(CollectionUtils.isEmpty(courseTeacherMajors)){
             return Result.success(null);
         }else {
-            List<Integer> courseIdList = list.stream().map(courseTeacherStudent::getCtsCourse).collect(Collectors.toList());
+            List<Integer> courseIdList = courseTeacherMajors.stream().map(courseTeacherMajor::getCtCourse).collect(Collectors.toList());
             List<course> courseList = courseMapper.selectBatchIds(courseIdList);
             return Result.success(courseList);
         }
@@ -260,6 +271,9 @@ public class ClassesMajorTargetServiceImpl implements ClassesMajorTargetService 
                     QueryWrapper<majorTargetCourse> queryWrapper1 = new QueryWrapper<>();
                     queryWrapper1.in("mtc_target",collect1);
                     int delete = majorTargetCourseMapper.delete(queryWrapper1);
+                    QueryWrapper<courseTargetTeacher> queryWrapper2 = new QueryWrapper<>();
+                    queryWrapper2.in("ctt_target",collect1);
+                    int delete1 = courseTargetTeacherMapper.delete(queryWrapper2);
                     /*
                     *将被删除了的target，从target表中删除
                     * */
@@ -341,14 +355,21 @@ public class ClassesMajorTargetServiceImpl implements ClassesMajorTargetService 
                 targetMapper.insertBatchNotExist(noExistTargetList);
             }
             List<majorTargetCourse> list = new ArrayList<>();
+            List<courseTargetTeacher> courseTargetTeacherList = new ArrayList<>();
             int tag = 0;
             for (target target : noExistTargetList) {
+                courseTargetTeacher  courseTargetTeacher = new courseTargetTeacher();
                 majorTargetCourse mtc = new majorTargetCourse();
                 mtc.setMtcMajor(param.getMajorId());
                 mtc.setMtcTarget(target.getId());
                 mtc.setMtcCourse(param.getCourseId());
                 mtc.setProportion(targetVoList.get(noExistList.get(tag)).getProportion());
                 list.add(mtc);
+
+                courseTargetTeacher.setCttTarget(target.getId());
+                courseTargetTeacher.setCttTeacher(param.getTeacherId());
+                courseTargetTeacher.setCttCourse(param.getCourseId());
+                courseTargetTeacherMapper.insert(courseTargetTeacher);
                 tag++;
             }
             if(!CollectionUtils.isEmpty(list))
@@ -356,7 +377,28 @@ public class ClassesMajorTargetServiceImpl implements ClassesMajorTargetService 
                 majorTargetCourseMapper.insertBatchNoExist(list);
             }
         }
+        else {
+            for (TargetVo targetVo : targetVoList) {
+                if("".equals(targetVo.getTarContent())){
+                    continue;
+                }
+                courseTargetTeacher courseTargetTeacher = new courseTargetTeacher();
+                target target = new target();
+                target.setTarContent(targetVo.getTarContent());
+                targetMapper.insert(target);
+                majorTargetCourse mtc = new majorTargetCourse();
+                mtc.setMtcMajor(param.getMajorId());
+                mtc.setMtcTarget(target.getId());
+                mtc.setMtcCourse(param.getCourseId());
+                mtc.setProportion(targetVo.getProportion());
+                majorTargetCourseMapper.insert(mtc);
 
+                courseTargetTeacher.setCttTarget(target.getId());
+                courseTargetTeacher.setCttTeacher(param.getTeacherId());
+                courseTargetTeacher.setCttCourse(param.getCourseId());
+                courseTargetTeacherMapper.insert(courseTargetTeacher);
+            }
+        }
 //
 //        if(!CollectionUtils.isEmpty(existTargetList)){
 //            targetMapper.insertBatch(existTargetList);
@@ -433,34 +475,65 @@ public class ClassesMajorTargetServiceImpl implements ClassesMajorTargetService 
         * 将修改后的知识点存入数据库
         * */
         Result knowledgeList = this.getKnowledgeList(param.getCourseId(), param.getTeacherId());
-        List<knowledge> searchTargetList = (List)knowledgeList.getData();
         List<knowledge> requestTargetList = param.getKnowledgeList();
-        /*
-        * 处理被删除了的知识点
-        * */
-        List<Integer> collect1 = searchTargetList.stream().map(knowledge::getId).collect(Collectors.toList());
-        List<Integer> collect2 = requestTargetList.stream().map(knowledge::getId).collect(Collectors.toList());
-        List<Integer> deleteList = new ArrayList<>();
-        for (Integer integer : collect1) {
-            if(collect2.contains(integer))
-            {
-                continue;
+
+        if(knowledgeList != null){
+            List<knowledge> searchTargetList = (List)knowledgeList.getData();
+
+            /*
+             * 处理被删除了的知识点
+             * */
+            List<Integer> collect1 = searchTargetList.stream().map(knowledge::getId).collect(Collectors.toList());
+            List<Integer> collect2 = requestTargetList.stream().map(knowledge::getId).collect(Collectors.toList());
+            List<Integer> deleteList = new ArrayList<>();
+            for (Integer integer : collect1) {
+                if(collect2.contains(integer))
+                {
+                    continue;
+                }
+                deleteList.add(integer);
             }
-            deleteList.add(integer);
+            if(!CollectionUtils.isEmpty(deleteList))
+            {
+                QueryWrapper<courseKnowledgeTeacher> queryWrapper =new QueryWrapper<>();
+                queryWrapper.eq("ck_teacher",param.getTeacherId())
+                        .in("ck_knowledge",deleteList);
+                courseKnowledgeTeacherMapper.delete(queryWrapper);
+            }
+
+
+            /*
+             * 处理修改过内容的knowledge
+             * */
+            List<knowledge> updateKnowledgeList = new ArrayList<>();
+            for (knowledge knowledge : searchTargetList) {
+                for (com.wyu.common.dao.pojo.knowledge knowledge1 : requestTargetList) {
+                    if(knowledge1.getId()!=null && knowledge.getId() == knowledge1.getId())
+                    {
+                        if(!knowledge.getKnoContent().equals(knowledge1.getKnoContent()) )
+                        {
+                            updateKnowledgeList.add(knowledge1);
+                        }
+                    }
+
+
+                }
+            }
+            if(!CollectionUtils.isEmpty(updateKnowledgeList))
+            {
+                for (knowledge knowledge : updateKnowledgeList) {
+                    knowledgeMapper.updateById(knowledge);
+                }
+
+            }
         }
-        if(!CollectionUtils.isEmpty(deleteList))
-        {
-            QueryWrapper<courseKnowledgeTeacher> queryWrapper =new QueryWrapper<>();
-            queryWrapper.eq("ck_teacher",param.getTeacherId())
-                    .in("ck_knowledge",deleteList);
-            courseKnowledgeTeacherMapper.delete(queryWrapper);
-        }
+
         /*
          * 处理新增的知识点
          * */
         List<knowledge> newKnowledgeList = new ArrayList<>();
         for (knowledge knowledge : requestTargetList) {
-            if(knowledge.getId() == null)
+            if(knowledge.getId() == null || knowledge.getId() == 0)
             {
                 knowledge.setKnoCourse(param.getCourseId());
                 newKnowledgeList.add(knowledge);
@@ -475,30 +548,6 @@ public class ClassesMajorTargetServiceImpl implements ClassesMajorTargetService 
                 courseKnowledgeTeacher.setCkKnowledge(knowledge.getId());
                 courseKnowledgeTeacher.setCkTeacher(param.getTeacherId());
                 courseKnowledgeTeacherMapper.insert(courseKnowledgeTeacher);
-            }
-
-        }
-        /*
-         * 处理修改过内容的knowledge
-         * */
-        List<knowledge> updateKnowledgeList = new ArrayList<>();
-        for (knowledge knowledge : searchTargetList) {
-            for (com.wyu.common.dao.pojo.knowledge knowledge1 : requestTargetList) {
-                if(knowledge1.getId()!=null && knowledge.getId() == knowledge1.getId())
-                {
-                    if(!knowledge.getKnoContent().equals(knowledge1.getKnoContent()) )
-                    {
-                        updateKnowledgeList.add(knowledge1);
-                    }
-                }
-
-
-            }
-        }
-        if(!CollectionUtils.isEmpty(updateKnowledgeList))
-        {
-            for (knowledge knowledge : updateKnowledgeList) {
-                knowledgeMapper.updateById(knowledge);
             }
 
         }

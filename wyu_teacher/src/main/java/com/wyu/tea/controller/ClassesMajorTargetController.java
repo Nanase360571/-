@@ -43,9 +43,10 @@ public class ClassesMajorTargetController {
         return classesMajorTargetService.addClassesToMajor(param);
     }
     @GetMapping("/getCourseList")
-    public Result getCourseList(@RequestParam("teacherId")Integer teacherId)
+    public Result getCourseList(@RequestParam("teacherId")Integer teacherId,
+                                @RequestParam("majorId")Integer majorId)
     {
-        return classesMajorTargetService.getCourseList(teacherId);
+        return classesMajorTargetService.getCourseList(teacherId,majorId);
 
     }
     @PostMapping("/getTargetList")

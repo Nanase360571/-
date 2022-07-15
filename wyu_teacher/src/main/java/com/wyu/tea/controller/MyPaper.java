@@ -2,10 +2,9 @@ package com.wyu.tea.controller;
 
 import com.wyu.common.vo.Result;
 import com.wyu.tea.service.PaperService;
+import com.wyu.tea.vo.params.AnalyseByKnowledgeVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 
@@ -28,5 +27,36 @@ public class MyPaper {
 
         return paperService.getAllPaperList(teacherId);
     }
+
+    @GetMapping("getAllClasses")
+    public Result getAllClasses(@PathParam("teacherId") Integer teacherId,
+                                @PathParam("paperId") Integer paperId){
+
+        return paperService.getAllClasses(teacherId,paperId);
+    }
+    @PostMapping("analyseByKnowledge")
+    public Result analyseByKnowledge(@RequestBody AnalyseByKnowledgeVo params){
+
+        return paperService.analyseByKnowledge(params);
+    }
+
+    @PostMapping("analyseByTarget")
+    public Result analyseByTarget(@RequestBody AnalyseByKnowledgeVo params){
+
+        return paperService.analyseByTarget(params);
+    }
+    @PostMapping("analyseByRandom")
+    public Result analyseByRandom(@RequestBody AnalyseByKnowledgeVo params){
+
+        return paperService.analyseByRandom(params);
+    }
+
+    @PostMapping("analyseBySelf")
+    public Result analyseBySelf(@RequestBody AnalyseByKnowledgeVo params){
+
+        return paperService.analyseBySelf(params);
+    }
+
+
 
 }

@@ -18,6 +18,7 @@ public class paperStudentDb {
     private Integer psdStudent;
     private Integer psdPaper;
     private Integer psdDb;
-    private Integer psdScore;
-    private Integer psdAnswer;
+    private Double psdScore;
+    private Integer psdDbType;
+    private String psdAnswer;
 }

@@ -61,6 +61,8 @@ public class DealContent {
         ArrayList<String> answer = new ArrayList();
         answer.add(db.getDbAnswer());
         dbVo.setAnswer(answer);
+        dbVo.setId(db.getId());
+        dbVo.setDbType(db.getDbType());
         return dbVo;
     }
     private static dbVo getMultipleChoice(db db) {
@@ -94,7 +96,6 @@ public class DealContent {
             answer.add(stringBuffer.toString());
             stringBuffer = new StringBuffer();
         }
-        answer.add(db.getDbAnswer());
         dbVo.setAnswer(answer);
         return dbVo;
     }
@@ -127,5 +128,26 @@ public class DealContent {
         answer.add(db.getDbAnswer());
         dbVo.setAnswer(answer);
         return dbVo;
+    }
+
+    public static ArrayList<String> getMultipleAnswer(db db){
+        String dbContent = db.getDbAnswerText();
+        String[] split = dbContent.split("");
+        ArrayList<String> answerList = new ArrayList<>();
+        StringBuffer buffer=new StringBuffer();
+        String c = null;
+        for (int i = 0; i < split.length; i++) {
+            c = split[i];
+            if(c.equals("|")){
+                answerList.add(buffer.toString());
+                buffer=new StringBuffer();
+                continue;
+            }
+            buffer.append(c);
+
+        }
+        answerList.add(buffer.toString());
+
+        return answerList;
     }
 }

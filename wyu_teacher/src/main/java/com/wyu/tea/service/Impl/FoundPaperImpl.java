@@ -56,6 +56,8 @@ public class FoundPaperImpl implements FoundPaperService {
     private DbTargetPaperMapper dbTargetPaperMapper;
     @Autowired
     private DbCourseMapper dbCourseMapper;
+    @Autowired
+    private StudentPaperMapper studentPaperMapper;
 
     @Override
     @Transactional
@@ -184,10 +186,22 @@ public class FoundPaperImpl implements FoundPaperService {
             paper.setPapStart(params.getStartTime());
             paper.setPapEnd(params.getEndTime());
             paper.setPapTotal(params.getPaperSum());
-            paper.setPapSingle(singleNumber);
-            paper.setPapMulti(multiNumber);
-            paper.setPapJudge(judgeNumber);
+            /**
+             * 题目量
+             * */
+            paper.setPapSingle(params.getSingleNumber());
+            paper.setPapMulti(params.getMultiNumber());
+            paper.setPapJudge(params.getJudgeNumber());
+
+            /**
+             * 总分
+             * */
+            paper.setPapSingleSum(params.getSingleSum());
+            paper.setPapMultiSum(params.getMultiSum());
+            paper.setPapJudgeSum(params.getJudgeSum());
+            paper.setPapFound(params.getPapFound());
             paper.setPapName(params.getPaperName());
+            paper.setPapExamTime(params.getExamTime());
             paperMapper.insert(paper);
 
             /*
@@ -248,23 +262,28 @@ public class FoundPaperImpl implements FoundPaperService {
             if(CollectionUtils.isEmpty(courseTeacherStudents)){
                 return Result.fail(1005,"该门课并没有学生");
             }
-//
-//            for (int i = 0; i < list.size(); i++) {
-//                paperStudentDb paperStudentDb = new paperStudentDb();
-//                paperStudentDb.setPsdPaper(paper.getId());
-//                paperStudentDb.setPsdDb(list.get(i).getId());
-//                paperStudentDb.setPsdStudent(courseTeacherStudents.get(i).getCtsStudent());
-//                paperStudentDbMapper.insert(paperStudentDb);
-//            }
+
             for (db db : list) {
                 for (courseTeacherStudent courseTeacherStudent : courseTeacherStudents) {
                     paperStudentDb paperStudentDb = new paperStudentDb();
                     paperStudentDb.setPsdPaper(paper.getId());
                     paperStudentDb.setPsdDb(db.getId());
                     paperStudentDb.setPsdStudent(courseTeacherStudent.getCtsStudent());
+                    paperStudentDb.setPsdDbType(db.getDbType());
                     paperStudentDbMapper.insert(paperStudentDb);
                 }
             }
+            /**
+             * 插入到paperStudent表中
+             * */
+            List<Integer> studentIds = courseTeacherStudents.stream().map(courseTeacherStudent::getCtsStudent).collect(Collectors.toList());
+            for (Integer studentId : studentIds) {
+                studentPaper studentPaper = new studentPaper();
+                studentPaper.setSpStudent(studentId);
+                studentPaper.setSpPaper(paper.getId());
+                studentPaperMapper.insert(studentPaper);
+            }
+
             return Result.success(200);
         }
 
@@ -316,17 +335,17 @@ public class FoundPaperImpl implements FoundPaperService {
                 List<Integer> eachList = new ArrayList<>();
                 Integer tag = targetParam.getProportion()*singleNumber;
                 if(tag%100!=0){
-                    return Result.fail(1003,"请合理分配知识点，使得每个知识点x题型对应比例是一个整数");
+                    return Result.fail(1003,"请合理分配课程目标，使得每个课程目标x题型对应比例是一个整数");
                 }
                 eachList.add(tag/100);
                 tag=targetParam.getProportion()*multiNumber;
                 if(tag%100!=0){
-                    return Result.fail(1003,"请合理分配知识点，使得每个知识点x题型对应比例是一个整数");
+                    return Result.fail(1003,"请合理分配课程目标，使得每个课程目标x题型对应比例是一个整数");
                 }
                 eachList.add(tag/100);
                 tag=targetParam.getProportion()*judgeNumber;
                 if(tag%100!=0){
-                    return Result.fail(1003,"请合理分配知识点，使得每个知识点x题型对应比例是一个整数");
+                    return Result.fail(1003,"请合理分配课程目标，使得每个课程目标x题型对应比例是一个整数");
                 }
                 eachList.add(tag/100);
                 sumEachList.add(eachList);
@@ -339,7 +358,7 @@ public class FoundPaperImpl implements FoundPaperService {
             for (targetParam targetParam : reallyTargetParamsList) {
                 List<dbTargetTeacher> dbTargetTeacherList = getDbTargetTeacherList(targetParam.getId(), params.getTeacherId());
                 if(CollectionUtils.isEmpty(dbTargetTeacherList)){
-                    return Result.fail(1002,"请为题目设置对应知识点");
+                    return Result.fail(1002,"请为题目设置对应课程目标");
                 }
                 List<Integer> collect = dbTargetTeacherList.stream().map(dbTargetTeacher::getDtDb).collect(Collectors.toList());
                 List<db> dbList = getDbList(collect);
@@ -370,7 +389,7 @@ public class FoundPaperImpl implements FoundPaperService {
             }
             if(tag == 1)
             {
-                return Result.fail(1001,"知识点所对应的题量不足，请合理分配");
+                return Result.fail(1001,"课程目标所对应的题量不足，请合理分配");
             }
 
 
@@ -393,10 +412,22 @@ public class FoundPaperImpl implements FoundPaperService {
             paper.setPapStart(params.getStartTime());
             paper.setPapEnd(params.getEndTime());
             paper.setPapTotal(params.getPaperSum());
-            paper.setPapSingle(singleNumber);
-            paper.setPapMulti(multiNumber);
-            paper.setPapJudge(judgeNumber);
+            /**
+             * 题目量
+             * */
+            paper.setPapSingle(params.getSingleNumber());
+            paper.setPapMulti(params.getMultiNumber());
+            paper.setPapJudge(params.getJudgeNumber());
+
+            /**
+             * 总分
+             * */
+            paper.setPapSingleSum(params.getSingleSum());
+            paper.setPapMultiSum(params.getMultiSum());
+            paper.setPapJudgeSum(params.getJudgeSum());
             paper.setPapName(params.getPaperName());
+            paper.setPapFound(params.getPapFound());
+            paper.setPapExamTime(params.getExamTime());
             paperMapper.insert(paper);
 
             /*
@@ -480,11 +511,21 @@ public class FoundPaperImpl implements FoundPaperService {
                     paperStudentDb.setPsdPaper(paper.getId());
                     paperStudentDb.setPsdDb(db.getId());
                     paperStudentDb.setPsdStudent(courseTeacherStudent.getCtsStudent());
+                    paperStudentDb.setPsdDbType(db.getDbType());
                     paperStudentDbMapper.insert(paperStudentDb);
                 }
             }
 
-
+            /**
+             * 插入到paperStudent表中
+             * */
+            List<Integer> studentIds = courseTeacherStudents.stream().map(courseTeacherStudent::getCtsStudent).collect(Collectors.toList());
+            for (Integer studentId : studentIds) {
+                studentPaper studentPaper = new studentPaper();
+                studentPaper.setSpStudent(studentId);
+                studentPaper.setSpPaper(paper.getId());
+                studentPaperMapper.insert(studentPaper);
+            }
             return Result.success(200);
         }
 
@@ -520,16 +561,10 @@ public class FoundPaperImpl implements FoundPaperService {
 
             List<List<Integer>> sumEachList = new ArrayList<>();
 
-            /*
-            * 查询给门课程的所有题目
-            * */
-            QueryWrapper<dbCourse> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("dc_course",params.getCourseId());
-            List<dbCourse> dbCourseList = dbCourseMapper.selectList(queryWrapper);
-            if(dbCourseList.size() == 0)
-            {return null;}
-            List<Integer> collect = dbCourseList.stream().map(dbCourse -> dbCourse.getId()).collect(Collectors.toList());
-            List<db> list = dbMapper.selectBatchIds(collect);
+           QueryWrapper<db> dbQueryWrapper = new QueryWrapper<>();
+            dbQueryWrapper.eq("db_course", params.getCourseId());
+            List<db> list = dbMapper.selectList(dbQueryWrapper);
+            //List<db> list = dbMapper.selectBatchIds(collect);
 
             List<db> singleList = new ArrayList<>();
             List<db> multiList = new ArrayList<>();
@@ -574,10 +609,22 @@ public class FoundPaperImpl implements FoundPaperService {
             paper.setPapStart(params.getStartTime());
             paper.setPapEnd(params.getEndTime());
             paper.setPapTotal(params.getPaperSum());
-            paper.setPapSingle(params.getSingleSum());
-            paper.setPapMulti(params.getMultiSum());
-            paper.setPapJudge(params.getJudgeSum());
+            /**
+             * 题目量
+             * */
+            paper.setPapSingle(params.getSingleNumber());
+            paper.setPapMulti(params.getMultiNumber());
+            paper.setPapJudge(params.getJudgeNumber());
+
+            /**
+             * 总分
+             * */
+            paper.setPapSingleSum(params.getSingleSum());
+            paper.setPapMultiSum(params.getMultiSum());
+            paper.setPapJudgeSum(params.getJudgeSum());
             paper.setPapName(params.getPaperName());
+            paper.setPapFound(params.getPapFound());
+            paper.setPapExamTime(params.getExamTime());
             paperMapper.insert(paper);
 
             /*
@@ -634,16 +681,31 @@ public class FoundPaperImpl implements FoundPaperService {
 //                paperStudentDb.setPsdStudent(courseTeacherStudents.get(i).getCtsStudent());
 //                paperStudentDbMapper.insert(paperStudentDb);
 //            }
-            for (db db : list) {
+            ArrayList<db> list4 = new ArrayList<>();
+            list4.addAll(list1);
+            list4.addAll(list2);
+            list4.addAll(list3);
+            for (db db : list4) {
                 for (courseTeacherStudent courseTeacherStudent : courseTeacherStudents) {
                     paperStudentDb paperStudentDb = new paperStudentDb();
                     paperStudentDb.setPsdPaper(paper.getId());
                     paperStudentDb.setPsdDb(db.getId());
                     paperStudentDb.setPsdStudent(courseTeacherStudent.getCtsStudent());
+                    paperStudentDb.setPsdDbType(db.getDbType());
                     paperStudentDbMapper.insert(paperStudentDb);
                 }
             }
 
+            /**
+             * 插入到paperStudent表中
+             * */
+            List<Integer> studentIds = courseTeacherStudents.stream().map(courseTeacherStudent::getCtsStudent).collect(Collectors.toList());
+            for (Integer studentId : studentIds) {
+                studentPaper studentPaper = new studentPaper();
+                studentPaper.setSpStudent(studentId);
+                studentPaper.setSpPaper(paper.getId());
+                studentPaperMapper.insert(studentPaper);
+            }
             return Result.success(200);
         }
 
@@ -670,10 +732,24 @@ public class FoundPaperImpl implements FoundPaperService {
             paper.setPapStart(params.getStartTime());
             paper.setPapEnd(params.getEndTime());
             paper.setPapTotal(params.getPaperSum());
-            paper.setPapSingle(params.getSingleSum());
-            paper.setPapMulti(params.getMultiSum());
-            paper.setPapJudge(params.getJudgeSum());
+            /**
+             * 题目量
+             * */
+            paper.setPapSingle(params.getSingleNumber());
+            paper.setPapMulti(params.getMultiNumber());
+            paper.setPapJudge(params.getJudgeNumber());
+
+            /**
+             * 总分
+             * */
+            paper.setPapSingleSum(params.getSingleSum());
+            paper.setPapMultiSum(params.getMultiSum());
+            paper.setPapJudgeSum(params.getJudgeSum());
+
             paper.setPapName(params.getPaperName());
+            paper.setPapFound(params.getPapFound());
+            paper.setPapFound(params.getPapFound());
+            paper.setPapExamTime(params.getExamTime());
             paperMapper.insert(paper);
             /*
              * 将信息插入到Paper_teacher_course表中
@@ -737,8 +813,19 @@ public class FoundPaperImpl implements FoundPaperService {
                     paperStudentDb.setPsdPaper(paper.getId());
                     paperStudentDb.setPsdDb(dbVo.getId());
                     paperStudentDb.setPsdStudent(courseTeacherStudent.getCtsStudent());
+                    paperStudentDb.setPsdDbType(dbVo.getDbType());
                     paperStudentDbMapper.insert(paperStudentDb);
                 }
+            }
+            /**
+             * 插入到paperStudent表中
+             * */
+            List<Integer> studentIds = courseTeacherStudents.stream().map(courseTeacherStudent::getCtsStudent).collect(Collectors.toList());
+            for (Integer studentId : studentIds) {
+                studentPaper studentPaper = new studentPaper();
+                studentPaper.setSpStudent(studentId);
+                studentPaper.setSpPaper(paper.getId());
+                studentPaperMapper.insert(studentPaper);
             }
             return Result.success(200);
         }
@@ -747,18 +834,26 @@ public class FoundPaperImpl implements FoundPaperService {
 
     @Override
     public Result getAllDb(Integer courseId, Integer teacherId) {
-        QueryWrapper<dbCourse> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("dc_course" , courseId);
-        List<dbCourse> dbCourseList = dbCourseMapper.selectList(queryWrapper);
-        if(dbCourseList.size() == 0)
-        {
-            return Result.fail(10001,"该课程没有题库");
-        }
-        List<Integer> collect = dbCourseList.stream().map(dbCourse::getDcDb).collect(Collectors.toList());
-        List<db> list = dbMapper.selectBatchIds(collect);
+//        QueryWrapper<dbCourse> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("dc_course" , courseId);
+//        List<dbCourse> dbCourseList = dbCourseMapper.selectList(queryWrapper);
+//        if(dbCourseList.size() == 0)
+//        {
+//            return Result.fail(10001,"该课程没有题库");
+//        }
+//        List<Integer> collect = dbCourseList.stream().map(dbCourse::getDcDb).collect(Collectors.toList());
+//        List<db> list = dbMapper.selectBatchIds(collect);
+//
+//        QueryWrapper<db> queryWrapper1 = new QueryWrapper<>();
+//        queryWrapper1.eq("db_course",courseId);
+//        List<db> dbs = dbMapper.selectList(queryWrapper1);
+        QueryWrapper<db> dbQueryWrapper = new QueryWrapper<>();
+        dbQueryWrapper.eq("db_course",courseId);
+        List<db> list1 = dbMapper.selectList(dbQueryWrapper);
 
 
-        return Result.success(list);
+
+        return Result.success(list1);
     }
 
 

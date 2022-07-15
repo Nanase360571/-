@@ -1,36 +1,115 @@
 <template>
     <div>
+    <el-table :data="courseList">
+      <el-table-column
+          label="课程名称"
+          prop="couSubject">
+      </el-table-column>
+      <el-table-column>
+        <template slot-scope="scope">
+          <el-button
+              size="mini"
+              @click="randomTest(scope.row)">开始练习</el-button>
+          
+        </template>
+      </el-table-column>
+    </el-table>
 
-      <el-row>
-        <el-col :span="8" v-for="(o, index) in 1" :key="o" :offset="index > 0 ? 2 : 0">
-          <el-card :body-style="{ padding: '0px' }">
-            <div style="padding: 14px;">
-              <span>Linux测试</span>
-              <div class="bottom clearfix">
-                <time class="time">{{ currentDate }}</time>
-                <el-button type="text" class="button">开始测试</el-button>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          <el-dialog
+        title=""
+        :visible.sync="testDialogVisible"
+        width="100%"
+        heigh="100%"
+        :fullscreen="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :append-to-body="true"
+        :destroy-on-close="true"
+        :show-close="false"
+        
+    >
+    <div v-if="testDialogVisible">
+<TestPage :examDialogVisible="testDialogVisible" @CDis="changTestDialogVisible" 
+       :singleChoiceArrayList="singleChoiceArrayList"
+       :multipleChoiceArrayList="multipleChoiceArrayList"
+       :tfArrayList="tfArrayList"
+        :studentName="$store.state.student.name"
+        :singlePoint="2"
+        :multiPoint="2"
+        :judgePoint="2"
+        :papName="2"
+        :paperId="1"
+        :courseId="courseId"
+      ></TestPage>
+    </div>
+      
+
+    </el-dialog>
+
+
     </div>
 </template>
 
 <script>
 import axios from "axios";
+import TestPage from "@/components/Student/TestPage";
 export default {
   name:"MyTest",
+  components:{TestPage},
   data() {
     return {
-      currentDate: new Date(),
-      subject:'',
-      startData:'',
-      endDate:'',
+      courseList:[],
+      testDialogVisible:false,
+      singleChoiceArrayList:[],
+      multipleChoiceArrayList:[],
+      tfArrayList:[],
+      courseId:0
 
     };
   },
+  methods:{
+    changTestDialogVisible(value){
+      console.log(value)
+      this.testDialogVisible = value
+      this.singleChoiceArrayList = []
+      this.multipleChoiceArrayList =[]
+      this.tfArrayList = []
+    },
+    randomTest(row){
+      this.courseId=row.id
+        this.getData(row)
+    },
+    getData(row){
+      alert("可以进入考试")
+      this.testDialogVisible = true
+
+      axios.get('http://localhost:10086/randomTest',{
+      params:{
+        'id':row.id
+      }
+    }).then(
+         response =>{
+            this.courseList = response.data.data
+            this.singleChoiceArrayList = response.data.data.singleChoiceArrayList
+            this.multipleChoiceArrayList = response.data.data.multipleChoiceArrayList
+            this.tfArrayList = response.data.data.tfArrayList
+            this.testDialogVisible = true
+         }
+    )
+    },
+  },
   mounted() {
+    
+    axios.get('http://localhost:10086/getCourseTest',{
+      params:{
+        'studentId':this.$store.state.student.id
+      }
+    }).then(
+         response =>{
+            this.courseList = response.data.data
+
+         }
+    )
 }
 }
 </script>
