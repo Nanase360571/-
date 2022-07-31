@@ -76,7 +76,8 @@
 
 
 <script>
-import axios from "axios";axios.defaults.baseURL="http://localhost:10087"
+import axios from "axios";
+// axios.defaults.baseURL="http://47.101.133.168:10087"
 
 export default {
   name:"TeacherCourse",
@@ -107,7 +108,7 @@ export default {
     selectEvent(val){
         console.log(this.currentPaperId);
         if(this.currentFound === 1){
-        axios.post("analyseByKnowledge",{
+        axios.post("http://47.101.133.168:10087/analyseByKnowledge",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -127,7 +128,7 @@ export default {
       )
         }
         if(this.currentFound === 2){
-        axios.post("analyseByTarget",{
+        axios.post("http://47.101.133.168:10087/analyseByTarget",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -147,7 +148,7 @@ export default {
       )
         }
         if(this.currentFound === 3){
-        axios.post("analyseByRandom",{
+        axios.post("http://47.101.133.168:10087/analyseByRandom",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -165,7 +166,7 @@ export default {
       )
         }
         if(this.currentFound === 4){
-        axios.post("analyseByRandom",{
+        axios.post("http://47.101.133.168:10087/analyseByRandom",{
         classNo: val,
         paperId: this.currentPaperId,
         teacherId:this.$store.state.teacher.id
@@ -203,7 +204,7 @@ export default {
         //alert("考试结束,可以查看")
             
             this.currentFound = row.papFound
-            axios.get("getAllClasses",{
+            axios.get("http://47.101.133.168:10087/getAllClasses",{
               params:{
                 teacherId:this.$store.state.teacher.id,
                 paperId:row.id
@@ -223,7 +224,7 @@ export default {
     }
   },
   mounted() {
-    axios.get("getAllPaperList",{
+    axios.get("http://47.101.133.168:10087/getAllPaperList",{
       params:{
         teacherId:this.$store.state.teacher.id
       },headers:{

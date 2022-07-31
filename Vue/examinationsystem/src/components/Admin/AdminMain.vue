@@ -61,7 +61,7 @@
 </template>
 <script>
 import axios from "axios";
-axios.defaults.baseURL="http://localhost:10087"
+// axios.defaults.baseURL="http://47.101.133.168:10087"
 
 export default {
   name:'TeacherMain',
@@ -77,7 +77,7 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
       }).then(({ value }) => {
-        axios.post('updatePassword',{
+        axios.post('http://47.101.133.168:10088/updatePassword',{
           "account": this.$store.state.teacher.account,
           "password": value
 

@@ -57,7 +57,7 @@
 <script>
 import axios from "axios";
 import Header2 from "@/components/Student/Header2";
-axios.defaults.baseURL="http://localhost:10086"
+// axios.defaults.baseURL="http://47.101.133.168:10086"
 
 export default {
   name:"MyTest",
@@ -100,7 +100,7 @@ export default {
         alert("可以开始考试")
         this.papName = row.papName
         this.paperId = row.id
-        axios.get('paper/getPaperDb',{
+        axios.get('http://47.101.133.168:10086/paper/getPaperDb',{
           params:{
             'studentId':this.$store.state.student.id,
             'paperId':row.id,
@@ -138,7 +138,7 @@ export default {
   },
   mounted() {
     console.log("MyExam")
-    axios.get('paper/getPaperSummary',{
+    axios.get('http://47.101.133.168:10086/paper/getPaperSummary',{
       params:{
         'studentId':this.$store.state.student.id
       }

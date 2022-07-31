@@ -138,7 +138,7 @@
         class="upload-demo"
         drag
         multiple
-        action="upload"
+        :action="uploadAction()"
         :headers="headers"
         :data="uploadData"
         :show-file-list="false"
@@ -207,7 +207,8 @@
 </template>
 
 <script>
-import axios from "axios";axios.defaults.baseURL="http://localhost:10087"
+import axios from "axios";
+// axios.defaults.baseURL="http://47.101.133.168:10087"
 
 export default {
   data() {
@@ -215,7 +216,8 @@ export default {
       headers:{
         Authorization: sessionStorage.getItem("Authorization")
       },
-      imageUrl: '',
+      file:'',
+      imageUrl: 'http://47.101.133.168:10087/addPatchDb',
       //控制弹窗 显示
       dialogVisible:false,
       addDialogVisible:false,
@@ -238,7 +240,7 @@ export default {
         Authorization: sessionStorage.getItem("Authorization"),
         headers:{
           Authorization: sessionStorage.getItem("Authorization")
-        }
+        },
       },
       checkKnowledge:false,
       KnowledgeList:[],
@@ -248,9 +250,10 @@ export default {
     }
   },
   methods: {
+
     handleEdit(index, row) {
       console.log(row+"row");
-      axios.post("getStudentList",{
+      axios.post("http://47.101.133.168:10087/getStudentList",{
         teacherId: this.$store.state.teacher.id,
         courseId: this.tableData[index].courseId
       },{
@@ -283,7 +286,7 @@ export default {
       const tag = window.confirm("确定移除该学生吗?");
       if(tag){
         console.log(this.tempCourseId, row.id,this.$store.state.teacher.id);
-        axios.post('removeStudent',{
+        axios.post('http://47.101.133.168:10087/removeStudent',{
           courseId:this.tempCourseId,
           teacherId: this.$store.state.teacher.id,
           studentId: row.id
@@ -312,16 +315,27 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
+      this.file = file
       console.log(file.type)
       const  isXls = file.type
       if(isXls === "application/vnd.ms-excel")
       {
         alert("添加成功")
       }
+      axios.post("http://47.101.133.168:10087/addPatchDb",{
+        teacherId: this.$store.state.teacher.id,
+        courseId:this.tempCourseId,
+        Authorization: sessionStorage.getItem("Authorization"),
+        file:this.file,
+        headers:{
+          Authorization: sessionStorage.getItem("Authorization"),
+          'Content-Type': 'multipart/form-data'
+        },
+      })
 
     },
     addStudentToCourse(){
-      axios.post('addStudentToCourse',{
+      axios.post('http://47.101.133.168:10087/addStudentToCourse',{
           teacherId: this.$store.state.teacher.id,
           name:this.newStudent.name,
           account:this.newStudent.account,
@@ -347,7 +361,7 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
       }).then(({ value }) => {
-        axios.post('updateKnowledge',{
+        axios.post('http://47.101.133.168:10087/updateKnowledge',{
           "teacherId": this.$store.state.teacher.id,
           "courseId":this.showKnowledge[index].knoCourse,
           "id":this.showKnowledge[index].id,
@@ -378,7 +392,7 @@ export default {
       });
     },
     removeKnowledge(index, row){
-      axios.post('removeKnowledge',{
+      axios.post('http://47.101.133.168:10087/removeKnowledge',{
         "teacherId": this.$store.state.teacher.id,
         "courseId":this.showKnowledge[index].knoCourse,
         "id":this.showKnowledge[index].id,
@@ -399,12 +413,15 @@ export default {
           }
       )
     },
+    uploadAction(){
+      return "http://47.101.133.168:10087/upload"
+    },
     addKnowledgeToCourse(){
       this.$prompt("", '添加知识点', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
       }).then(({ value }) => {
-        axios.post('addKnowledgeToCourse',{
+        axios.post('http://47.101.133.168:10087/addKnowledgeToCourse',{
           "teacherId": this.$store.state.teacher.id,
           "courseId":this.tagCourseId,
           "knoContent": value
@@ -432,7 +449,7 @@ export default {
       });
     },
     async updateDataWhenChange() {
-       axios.get('getTeacherCourse?teacherId=' + this.$store.state.teacher.id, {
+       axios.get('http://47.101.133.168:10087/getTeacherCourse?teacherId=' + this.$store.state.teacher.id, {
         // params:{
         //   'teacherId': that.$store.state.teacher.id
         // },

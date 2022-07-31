@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <el-form class="form" :rules="rules" :model="form" ref="form">
+    <el-form class="form" :rules="rules" :model="form" ref="form" >
       <h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wyu在线考试登录界面</h3>
       <el-form-item label="账号" label-width="80px" prop="account">
         <el-input class="item" v-model="form.account" placeholder="请输入账号"></el-input>
@@ -48,7 +48,7 @@ data() {
   },
   methods: {
     onSubmitStudent(){
-      axios.post('http://localhost:10086/loginStudent',{
+      axios.post('http://47.101.133.168:10086/loginStudent',{
         "account": this.form.account,
         "password": this.form.password
 
@@ -64,7 +64,7 @@ data() {
             /*
             * 请求学生信息，并存储到store中
             * */
-            axios.post('http://localhost:10086/getStudentMsg',{
+            axios.post('http://47.101.133.168:10086/getStudentMsg',{
               "account": this.form.account,
               "password": this.form.password
 
@@ -95,7 +95,7 @@ data() {
       )
     },
     onSubmitTeacher(){
-      axios.post('http://localhost:10087/loginTeacher',{
+      axios.post('http://47.101.133.168:10087/loginTeacher',{
         "account": this.form.account,
         "password": this.form.password
 
@@ -111,7 +111,7 @@ data() {
               /*
               * 请求学生信息，并存储到store中
               * */
-              axios.post('http://localhost:10087/getTeacherMsg',{
+              axios.post('http://47.101.133.168:10087/getTeacherMsg',{
                 "account": this.form.account,
                 "password": this.form.password
 
@@ -143,7 +143,7 @@ data() {
       )
     },
     onSubmitAdmin(){
-            axios.post('http://localhost:10088/loginAdmin',{
+            axios.post('http://47.101.133.168:10088/loginAdmin',{
         "account": this.form.account,
         "password": this.form.password
 
@@ -159,7 +159,7 @@ data() {
               /*
               * 请求管理员信息，并存储到store中
               * */
-              axios.post('http://localhost:10088/getAdminMsg',{
+              axios.post('http://47.101.133.168:10088/getAdminMsg',{
                 "account": this.form.account,
                 "password": this.form.password
 
@@ -244,6 +244,6 @@ data() {
 }
 .myButton{
     margin-left: 18%;
-
+    display:inline-block;
 }
 </style>

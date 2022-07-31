@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import axios from "axios";axios.defaults.baseURL="http://localhost:10087"
+import axios from "axios";
+// axios.defaults.baseURL="http://47.101.133.168:10087"
 
 export default {
   name:"TeacherCourse",
@@ -31,7 +32,7 @@ export default {
   },
   methods:{
     startTest(row){
-    axios.get("startTest",{
+    axios.get("http://47.101.133.168:10087/startTest",{
       params:{
         id:row.id,
         couSubject:row.couSubject,
@@ -48,7 +49,7 @@ export default {
     )
     },
     endTest(row){
-    axios.get("endTest",{
+    axios.get("http://47.101.133.168:10087/endTest",{
       params:{
         id:row.id,
         couSubject:row.couSubject,
@@ -66,7 +67,7 @@ export default {
     },
   },
   mounted() {
-    axios.get("getAllCourse",{
+    axios.get("http://47.101.133.168:10087/getAllCourse",{
       params:{
         teacherId:this.$store.state.teacher.id
       },headers:{

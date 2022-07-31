@@ -17,7 +17,7 @@
 
 <script>
 import axios from "axios";
-axios.defaults.baseURL="http://localhost:10088"
+// axios.defaults.baseURL="http://47.101.133.168:10088"
 
 export default {
   name:"MyTest",
@@ -34,7 +34,7 @@ export default {
        if(this.formData.major === "" ){
         alert("专业名称不能为空")
       }else{
-        axios.post('addAdminMajor',{
+        axios.post('http://47.101.133.168:10088/addAdminMajor',{
                 "major":this.formData.major
 
               },{

@@ -163,7 +163,7 @@
 
 <script>
 import axios from "axios";
-axios.defaults.baseURL="http://localhost:10086"
+// axios.defaults.baseURL="http://47.101.133.168:10086"
 
 export default {
   name: "Header2",
@@ -398,7 +398,7 @@ export default {
       if(tag === 0){          alert("还有未完成题目")
 }
       if(tag === 1){
-      axios.post('paper/submitPaper',{
+      axios.post('http://47.101.133.168:10086/paper/submitPaper',{
           'account':this.$store.state.student.account,
           'studentId':this.$store.state.student.id,
           "paperId":this.paperId,

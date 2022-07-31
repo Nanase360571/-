@@ -223,7 +223,7 @@
                           class="upload-demo"
                           drag
                           multiple
-                          action="addPatchDb"
+                          :action="uploadFile()"
                           :data="uploadData"
                           :headers="headers"
                           :show-file-list="false"
@@ -240,7 +240,8 @@
 </template>
 
 <script>
-import axios from "axios";axios.defaults.baseURL="http://localhost:10087"
+import axios from "axios";
+// axios.defaults.baseURL="http://47.101.133.168:10087"
 
 export default {
   name: "TeacherCourse",
@@ -336,7 +337,7 @@ export default {
       window.location.href="/static/Itemformat.xls"
     },
     addDB(){
-      axios.post("addDB",{
+      axios.post("http://47.101.133.168:10087/addDB",{
         db: this.newDb,
         courseId: this.currentCourseId
       },{
@@ -419,7 +420,7 @@ export default {
       this.itemKey = Math.random();
       console.log("this.itemKey" + this.itemKey);
       axios
-        .get("getCourseDB", {
+        .get("http://47.101.133.168:10087/getCourseDB", {
           params: {
             courseId: course.id,
             teacherId: this.$store.state.teacher.id,
@@ -433,7 +434,7 @@ export default {
             this.dbList = response.data.data;
 
             axios
-              .get("getKnowledgeList", {
+              .get("http://47.101.133.168:10087/getKnowledgeList", {
                 params: {
                   courseId: course.id,
                   teacherId: this.$store.state.teacher.id,
@@ -460,7 +461,7 @@ export default {
                   }
 
                   axios
-                    .get("getTargetList", {
+                    .get("http://47.101.133.168:10087/getTargetList", {
                       params: {
                         courseId: course.id,
                         teacherId: this.$store.state.teacher.id,
@@ -510,7 +511,7 @@ export default {
       }
       console.log(row.targetId);
       axios
-        .post("updateKnowledgeAndTarget", {
+        .post("http://47.101.133.168:10087/updateKnowledgeAndTarget", {
           dbId: row.dbId,
           knoId: knoId,
           targetId: targetId,
@@ -531,6 +532,9 @@ export default {
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
     },
+    uploadFile() {
+      return "http://47.101.133.168:10087/addPatchDb"
+    },
     beforeAvatarUpload(file) {
       console.log(file.type)
       const  isXls = file.type
@@ -545,7 +549,7 @@ export default {
   mounted() {
     console.log("TeacherCourse");
     axios
-      .get("getAllCourse", {
+      .get("http://47.101.133.168:10087/getAllCourse", {
         params: {
           teacherId: this.$store.state.teacher.id,
         },

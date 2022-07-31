@@ -32,7 +32,7 @@
 
 <script>
 import axios from "axios";
-axios.defaults.baseURL="http://localhost:10088"
+// axios.defaults.baseURL="http://47.101.133.168:10088"
 
 export default {
   name:"MyTest",
@@ -56,7 +56,7 @@ export default {
         alert("专业,教师,课程不能为空")
       }
       else{
-        axios.post("submitRelation",{
+        axios.post("http://47.101.133.168:10088/submitRelation",{
         majorValue:this.majorValue,
         courseValues:this.courseValues,
         teacherValue:this.teacherValue
@@ -79,7 +79,7 @@ export default {
 
   },
   mounted() {
-    axios.post("getAllMajor",{
+    axios.post("http://47.101.133.168:10088/getAllMajor",{
       }).then(
           response =>{
             if(response.data.code === 200){
@@ -88,7 +88,7 @@ export default {
           }
       )
 
-      axios.post("getAllClasses",{
+      axios.post("http://47.101.133.168:10088/getAllClasses",{
       }).then(
           response =>{
             if(response.data.code === 200){
@@ -97,7 +97,7 @@ export default {
           }
       )
 
-      axios.post("getAllCourse",{
+      axios.post("http://47.101.133.168:10088/getAllCourse",{
       }).then(
           response =>{
             if(response.data.code === 200){
@@ -106,7 +106,7 @@ export default {
           }
       )
 
-      axios.post("getAllTeacher",{
+      axios.post("http://47.101.133.168:10088/getAllTeacher",{
       }).then(
           response =>{
             if(response.data.code === 200){

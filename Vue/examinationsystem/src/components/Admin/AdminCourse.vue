@@ -17,7 +17,7 @@
 
 <script>
 import axios from "axios";
-axios.defaults.baseURL="http://localhost:10088"
+// axios.defaults.baseURL="http://47.101.133.168:10088"
 
 export default {
   name:"MyTest",
@@ -35,7 +35,7 @@ export default {
       if(this.formData.subject === "" || this.formData.number === ""){
         alert("课程编号和课程不能为空")
       }else{
-        axios.post('addAdminCourse',{
+        axios.post('http://47.101.133.168:10088/addAdminCourse',{
                 "couSubject": this.formData.subject,
                 "couNumber": this.formData.number
 

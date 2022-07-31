@@ -22,7 +22,7 @@
 
 <script>
 import axios from "axios";
-axios.defaults.baseURL="http://localhost:10088"
+// axios.defaults.baseURL="http://47.101.133.168:10088"
 
 export default {
   name:"MyTest",
@@ -41,7 +41,7 @@ export default {
       if(this.formData.account === "" || this.formData.number === "" || this.formData.name === ""){
         alert("编号和密码和姓名不能为空")
       }else{
-        axios.post('addAdminTeacher',{
+        axios.post('http://47.101.133.168:10088/addAdminTeacher',{
                 "account": this.formData.account,
                 "password": this.formData.password,
                 "name":this.formData.name

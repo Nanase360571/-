@@ -219,7 +219,7 @@ import axios from "axios";
 import { saveAnswers } from "../../request/api";
 import { mapGetters } from "vuex";
 import Time from "../../components/module/Time"; // 倒计时组件
-axios.defaults.baseURL="http://localhost:10086"
+// axios.defaults.baseURL="http://47.101.133.168:10086"
 
 export default {
   name: "Exam",
@@ -336,7 +336,7 @@ export default {
     get() {
       if (this.$route.params.id != "" && this.$route.params.id != undefined) {
         axios
-            .get("/api/exams/" + this.$route.params.id)
+            .get("http://47.101.133.168:10086/api/exams/" + this.$route.params.id)
             .then(res => {
               if (res.data.code == 0) {
                 let data = res.data.data.item.exercise;
